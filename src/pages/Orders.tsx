@@ -6,14 +6,38 @@ import { getOrders } from "../services/orderService";
 export default function Orders() {
 
   const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadOrders();
   }, []);
 
   async function loadOrders() {
-    const data = await getOrders();
-    setOrders(data);
+    try {
+      const data = await getOrders();
+      setOrders(data);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <h1 className="text-3xl font-bold mb-6">
+          Orders
+        </h1>
+
+        <div className="space-y-4">
+          {[1, 2, 3].map((item) => (
+            <div
+              key={item}
+              className="h-16 bg-slate-800 rounded-xl animate-pulse"
+            />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
