@@ -1,14 +1,68 @@
-# Ecommerce Admin UI
+# 🛒 Ecommerce Admin UI
 
 Enterprise-grade admin dashboard for the Ecommerce Platform ecosystem.
 
-This project provides operational visibility and management capabilities for the microservices-based ecommerce backend platform.
+This application provides operational visibility and management capabilities for the Spring Boot–based ecommerce backend platform.
 
-The UI is designed to simulate a real-world enterprise operations portal with monitoring, analytics, order management, payment visibility, and inventory tracking.
+The UI simulates a real-world enterprise operations portal with analytics, monitoring, authentication, order management, payment visibility, inventory tracking, and system health monitoring.
 
 ---
 
-# Tech Stack
+# 🚀 Features
+
+## 🔐 Authentication & Security
+
+- JWT-based authentication
+- Protected React routes
+- Automatic token injection using Axios interceptors
+- Logout functionality
+- Role-based authorization support (`ADMIN`, `CUSTOMER`)
+
+## 📊 Dashboard Analytics
+
+- Total Orders
+- Paid Orders
+- Pending Orders
+- Cancelled Orders
+- Revenue Summary
+- Inventory Alerts
+- Order Status Chart
+
+## 🛒 Orders Management
+
+- View all orders
+- Search orders
+- Sorting
+- Pagination
+- Expandable order items
+- Status badges
+
+## 💳 Payments Management
+
+- View payment transactions
+- Payment method
+- Payment status
+- Payment timestamps
+
+## 📦 Inventory Management
+
+- Product pricing
+- Quantity available
+- Low stock indicators
+- Stock status badges
+
+## ❤️ System Health Monitoring
+
+- Application status
+- Database status
+- Disk space status
+- Readiness state
+- Liveness state
+- Health groups
+
+---
+
+# 🧰 Tech Stack
 
 - React
 - TypeScript
@@ -21,82 +75,64 @@ The UI is designed to simulate a real-world enterprise operations portal with mo
 
 ---
 
-# Related Projects
+# 🏗️ Related Projects
 
-Backend API:
+## Backend API
 
-- ecommerce-api
+- `ecommerce-api`
 
-Microservices:
+## Supporting Infrastructure
 
-- Order Service
-- Payment Service
-- Inventory Service
-
----
-
-# Current Milestones
-
-## Project Initialization
-- [x] React + TypeScript setup
-- [x] Vite configuration
-- [x] Initial project structure
-- [x] Tailwind CSS integration
-
-## Dashboard Foundation
-- [ ] Sidebar navigation
-- [ ] Dashboard layout
-- [ ] Analytics widgets
-- [ ] System health page
-
-## API Integration
-- [ ] Connect Order Service
-- [ ] Connect Payment Service
-- [ ] Connect Inventory Service
-- [ ] API Gateway integration
+- PostgreSQL
+- Apache Kafka
+- Docker Compose
+- Spring Boot Actuator
+- Swagger/OpenAPI
 
 ---
 
-# Planned Features
-
-## Operations Dashboard
-- Order monitoring
-- Payment tracking
-- Inventory visibility
-- Kafka event monitoring
-
-## Observability
-- Prometheus metrics
-- Grafana integration
-- Service health monitoring
-- Distributed tracing
-
-## Security
-- JWT authentication
-- Role-based access control
-- Session management
-
-## Enterprise Features
-- Real-time updates
-- WebSocket support
-- Dark/light themes
-- Docker deployment
-- CI/CD pipelines
-
----
-
-# Planned Architecture
+# 📁 Project Structure
 
 ```text
 ecommerce-admin-ui
 │
 ├── src
-│   ├── api
 │   ├── components
-│   ├── hooks
+│   │   ├── ProtectedRoute.tsx
+│   │   ├── Sidebar.tsx
+│   │   ├── Header.tsx
+│   │   └── StatCard.tsx
+│   │
 │   ├── layouts
+│   │   └── MainLayout.tsx
+│   │
 │   ├── pages
-│   ├── routes
+│   │   ├── Login.tsx
+│   │   ├── Dashboard.tsx
+│   │   ├── Orders.tsx
+│   │   ├── Payments.tsx
+│   │   ├── Inventory.tsx
+│   │   └── SystemHealth.tsx
+│   │
 │   ├── services
+│   │   ├── api.ts
+│   │   ├── authService.ts
+│   │   ├── dashboardService.ts
+│   │   ├── orderService.ts
+│   │   ├── paymentService.ts
+│   │   ├── inventoryService.ts
+│   │   └── systemHealthService.ts
+│   │
 │   ├── types
-│   └── utils
+│   │   ├── Auth.ts
+│   │   ├── DashboardSummary.ts
+│   │   ├── Order.ts
+│   │   ├── Payment.ts
+│   │   ├── Inventory.ts
+│   │   └── HealthStatus.ts
+│   │
+│   ├── App.tsx
+│   └── main.tsx
+│
+├── package.json
+└── README.md
