@@ -5,12 +5,14 @@
 ![Vite](https://img.shields.io/badge/Vite-6-purple)
 ![JWT](https://img.shields.io/badge/Auth-JWT-green)
 ![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-4-38bdf8)
+![Grafana](https://img.shields.io/badge/Grafana-Monitoring-orange)
+![Prometheus](https://img.shields.io/badge/Prometheus-Metrics-red)
 
 Enterprise-grade admin dashboard for the Ecommerce Platform ecosystem.
 
-This frontend provides operational visibility and management capabilities for the Spring Boot backend.
+This frontend provides operational visibility and management capabilities for the Spring Boot backend, simulating a real-world operations portal used by support, engineering, and business teams.
 
-Backend Repository:
+Backend Repository:  
 ➡️ https://github.com/mikeywestie/ecommerce-api
 
 ---
@@ -19,39 +21,54 @@ Backend Repository:
 
 This project demonstrates:
 
-- Secure authentication flows
+- Secure JWT-based authentication
 - Protected React routing
-- API integration with JWT
-- Operational dashboards
-- Analytics visualization
-- Monitoring and observability
+- Axios interceptors for token injection
+- Operational dashboards and KPI visualizations
+- Order, payment, and inventory management
+- System health monitoring via Spring Boot Actuator
+- Integration with Prometheus and Grafana
 - Production-quality UI architecture
 
 ---
 
 ## 🚀 Current Release
 
-**Latest Stable Release:** `v1.0.0 Admin Dashboard Foundation ✅`
+**Latest Stable Release:** `v1.1.0 Observability Integration ✅`
 
-**Next Major Release:** `v1.1.0 Observability & Monitoring`
+**Next Major Release:** `v1.2.0 Deployment & CI/CD`
 
 ---
 
 ## 🗂️ Release Milestones
 
+The frontend was built iteratively, beginning with static mock data and evolving into a fully integrated operations dashboard.
+
+### Architectural Trade-Offs and Decisions
+
+- **Static mock data first** to accelerate UI development before backend APIs were finalized.
+- **LocalStorage for JWT tokens** for simplicity and transparency in a portfolio project.
+- **Global Axios interceptor** to centralize authentication handling.
+- **ProtectedRoute component** to keep authorization logic reusable and isolated.
+- **Fixed sidebar layout** to emulate enterprise dashboard UX.
+- **Client-side search, sorting, and pagination** for current dataset sizes, with a future option to move to server-side pagination.
+- **Tailwind CSS** chosen for rapid iteration and maintainable styling.
+
+---
+
 ### v1.0.0 Admin Dashboard Foundation ✅
 
 #### Authentication
 - Login page
-- JWT storage
-- Axios interceptor
+- JWT token storage
 - Protected routes
-- Logout
+- Logout functionality
+- Automatic redirect to login when unauthenticated
 
 #### Dashboard
 - KPI widgets
 - Revenue metrics
-- Charts
+- Bar charts using Recharts
 
 #### Operations Pages
 - Orders
@@ -59,74 +76,102 @@ This project demonstrates:
 - Inventory
 - System Health
 
-#### UX
+#### User Experience
 - Fixed sidebar
-- Loading states
+- Responsive layout
+- Loading skeletons
 - Error handling
 - Status badges
 
 **Why this milestone matters**  
-Demonstrates enterprise frontend architecture and secure integration with a protected backend.
+Established a secure and scalable UI foundation before adding infrastructure integrations.
 
 ---
 
-### v1.1.0 Observability & Monitoring 🚀
+### v1.1.0 Observability Integration ✅
+
+#### Monitoring Stack
+- Prometheus metrics scraping
+- Grafana dashboards
+- System Health page integration
+
+#### Operational Visibility
+- Application health
+- Database status
+- Disk space usage
+- JVM metrics
+- HTTP request metrics
+
+**Why this milestone matters**  
+Introduced production-style observability, enabling real-time operational monitoring.
+
+---
+
+### v1.2.0 Deployment & CI/CD 🚀
 
 Planned:
-- Prometheus dashboards
-- Grafana dashboards
-- Kafka monitoring
+- Dockerized frontend
+- Nginx production configuration
+- GitHub Actions build pipeline
 
 ---
 
 ## 🛣️ Roadmap
 
-### v1.1 Monitoring
-- Prometheus
-- Grafana
-- Metrics widgets
-
-### v1.2 Deployment
+### v1.2 Deployment & CI/CD
 - Docker image
 - Nginx
+- GitHub Actions pipeline
 
-### v1.3 DevOps
-- GitHub Actions CI/CD
+### v1.3 Monitoring Enhancements
+- Embedded Grafana links
+- Prometheus widgets
+- Kafka monitoring indicators
 
 ### v2.0 Enterprise Enhancements
-- WebSocket updates
-- Role-based menus
+- WebSocket real-time updates
+- Role-based menu rendering
 - Theme switching
+- Notification center
 
 ---
 
 ## ✨ Features
 
-### Security
+### 🔐 Security
 - JWT Authentication
 - Protected Routes
+- Axios Interceptors
 - Logout
 
-### Dashboard
+### 📊 Dashboard
 - Orders summary
-- Revenue
+- Revenue metrics
 - Inventory alerts
 - Charts
 
-### Orders
+### 🛒 Orders
 - Search
 - Sorting
 - Pagination
 - Expandable order items
+- Status badges
 
-### Payments
-- Payment status and timestamps
+### 💳 Payments
+- Payment method visibility
+- Payment status tracking
+- Payment timestamps
 
-### Inventory
-- Low stock alerts
+### 📦 Inventory
+- Product visibility
+- Quantity available
+- Low stock indicators
 
-### System Health
-- Spring Boot Actuator integration
+### ❤️ System Health
+- Application status
+- Database status
+- Disk space
+- Readiness and liveness probes
 
 ---
 
@@ -144,136 +189,9 @@ JWT PostgreSQL   Kafka
       │
       ▼
 Spring Actuator
-````
-
----
-
-## 🧰 Tech Stack
-
-* React
-* TypeScript
-* Vite
-* Tailwind CSS
-* Axios
-* React Router
-* Recharts
-* Lucide React
-
----
-
-## 📁 Project Structure
-
-```text
-src
-├── components
-├── layouts
-├── pages
-├── services
-├── types
-├── App.tsx
-└── main.tsx
-```
-
----
-
-## 🌐 Pages
-
-| Page          | Description          |
-| ------------- | -------------------- |
-| Login         | Authentication       |
-| Dashboard     | KPIs and charts      |
-| Orders        | Order management     |
-| Payments      | Payment monitoring   |
-| Inventory     | Stock visibility     |
-| System Health | Actuator integration |
-
----
-
-## 🔗 Backend Endpoints Used
-
-| Endpoint                     | Purpose   |
-| ---------------------------- | --------- |
-| `POST /api/auth/login`       | Login     |
-| `GET /api/dashboard/summary` | KPIs      |
-| `GET /api/orders`            | Orders    |
-| `GET /api/payments`          | Payments  |
-| `GET /api/inventory`         | Inventory |
-| `GET /actuator/health`       | Health    |
-
----
-
-## 🔑 Demo Credentials
-
-```text
-Email: admin2@ecommerce.local
-Password: Admin@12345
-```
-
----
-
-## ▶️ Running the Application
-
-### Install Dependencies
-
-```bash
-npm install
-```
-
-### Start Development Server
-
-```bash
-npm run dev
-```
-
-### Open Browser
-
-```text
-http://localhost:5173
-```
-
----
-
-## 🐞 Debugging Tips
-
-### Clear Authentication
-
-Delete the following keys from Local Storage:
-
-* token
-* email
-* role
-
-### Useful Commands
-
-```bash
-npm run dev
-```
-
-```bash
-npm run build
-```
-
----
-
-## 📚 Helpful Resources
-
-* React: [https://react.dev/](https://react.dev/)
-* TypeScript: [https://www.typescriptlang.org/](https://www.typescriptlang.org/)
-* Vite: [https://vite.dev/](https://vite.dev/)
-* Tailwind CSS: [https://tailwindcss.com/](https://tailwindcss.com/)
-* Recharts: [https://recharts.org/](https://recharts.org/)
-
----
-
-## 👨‍💻 Author
-
-**Michael Westman**
-
-* GitHub: [https://github.com/mikeywestie](https://github.com/mikeywestie)
-* LinkedIn: [https://www.linkedin.com/in/michael-westman-219178188/](https://www.linkedin.com/in/michael-westman-219178188/)
-
----
-
-## ⭐ Support
-
-If you found this project useful, please consider starring both repositories.
+      │
+      ▼
+Prometheus
+      │
+      ▼
+Grafana
