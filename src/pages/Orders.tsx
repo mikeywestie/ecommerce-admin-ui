@@ -26,6 +26,18 @@ export default function Orders() {
     }
   }
 
+  function getStatusStyle(status: Order["status"]) {
+    if (status === "PAID") {
+      return "bg-green-500/20 text-green-400";
+    }
+
+    if (status === "PENDING" || status === "CREATED") {
+      return "bg-yellow-500/20 text-yellow-400";
+    }
+
+    return "bg-red-500/20 text-red-400";
+  }
+
   if (error) {
     return (
       <div className="p-6">
@@ -84,18 +96,14 @@ export default function Orders() {
                 className="border-t border-slate-700 hover:bg-slate-700 transition"
               >
                 <td className="p-4">{order.id}</td>
-                <td className="p-4">{order.customer}</td>
-                <td className="p-4">{order.amount}</td>
+                <td className="p-4">{order.customerName}</td>
+                <td className="p-4">R {order.totalAmount.toFixed(2)}</td>
 
                 <td className="p-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      order.status === "PAID"
-                        ? "bg-green-500/20 text-green-400"
-                        : order.status === "PENDING"
-                        ? "bg-yellow-500/20 text-yellow-400"
-                        : "bg-red-500/20 text-red-400"
-                    }`}
+                    className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusStyle(
+                      order.status
+                    )}`}
                   >
                     {order.status}
                   </span>
