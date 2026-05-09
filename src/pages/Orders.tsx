@@ -84,8 +84,10 @@ export default function Orders() {
             <tr>
               <th className="text-left p-4">Order ID</th>
               <th className="text-left p-4">Customer</th>
+              <th className="text-left p-4">Email</th>
               <th className="text-left p-4">Amount</th>
               <th className="text-left p-4">Status</th>
+              <th className="text-left p-4">Created</th>
             </tr>
           </thead>
 
@@ -97,6 +99,7 @@ export default function Orders() {
               >
                 <td className="p-4">{order.id}</td>
                 <td className="p-4">{order.customerName}</td>
+                <td className="p-4 text-slate-400">{order.customerEmail}</td>
                 <td className="p-4">R {order.totalAmount.toFixed(2)}</td>
 
                 <td className="p-4">
@@ -107,6 +110,10 @@ export default function Orders() {
                   >
                     {order.status}
                   </span>
+                </td>
+
+                <td className="p-4 text-slate-400">
+                  {new Date(order.createdAt).toLocaleDateString()}
                 </td>
               </tr>
             ))}
