@@ -11,12 +11,23 @@ import Orders from "./pages/Orders";
 import Payments from "./pages/Payments";
 import Inventory from "./pages/Inventory";
 import SystemHealth from "./pages/SystemHealth";
+import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<MainLayout />}>
+        <Route path="/login" element={<Login />} />
+
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Dashboard />} />
           <Route path="orders" element={<Orders />} />
           <Route path="payments" element={<Payments />} />
