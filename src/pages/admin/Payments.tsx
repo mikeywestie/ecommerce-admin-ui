@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import type { Payment } from "../types/Payment";
-import { getPayments } from "../services/paymentService";
+import { getPayments } from "../../services/paymentService";
 
 export default function Payments() {
   const [payments, setPayments] = useState<Payment[]>([]);

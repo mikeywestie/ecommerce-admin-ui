@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import type { InventoryItem } from "../types/Inventory";
-import { getInventory } from "../services/inventoryService";
+import { getInventory } from "../../services/inventoryService";
 
 export default function Inventory() {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);

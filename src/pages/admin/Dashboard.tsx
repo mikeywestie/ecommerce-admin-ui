@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-import StatCard from "../components/StatCard";
+import StatCard from "../../components/StatCard";
+import { getDashboardSummary } from "../../services/dashboardService";
 import type { DashboardSummary } from "../types/DashboardSummary";
-import { getDashboardSummary } from "../services/dashboardService";
 
 import {
   BarChart,

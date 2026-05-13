@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { login, saveAuth } from "../services/authService";
+import { login, saveAuth } from "../../services/authService";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -24,8 +24,7 @@ export default function Login() {
       });
 
       saveAuth(auth);
-
-      navigate("/");
+        navigate("/admin");
     } catch {
       setError("Invalid email or password.");
     } finally {

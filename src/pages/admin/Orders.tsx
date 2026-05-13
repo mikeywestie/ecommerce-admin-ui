@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 
 import type { Order } from "../types/Order";
-import { getOrders } from "../services/orderService";
+import { getOrders } from "../../services/orderService";
 
 type SortField =
   | "id"
