@@ -8,6 +8,26 @@
 ![Grafana](https://img.shields.io/badge/Grafana-Monitoring-orange)
 ![Prometheus](https://img.shields.io/badge/Prometheus-Metrics-red)
 
+## 📸 Application Screenshots
+
+### 🔐 Login Screen
+![Login Screen](docs/screenshots/01-login.png)
+
+### 📊 Admin Dashboard
+![Admin Dashboard](docs/screenshots/02-admin-dashboard.png)
+
+### 🛒 Orders Management
+![Orders Management](docs/screenshots/03-orders.png)
+
+### 💳 Payments Monitoring
+![Payments Monitoring](docs/screenshots/04-payments.png)
+
+### 📦 Inventory Management
+![Inventory Management](docs/screenshots/05-inventory.png)
+
+### ❤️ System Health Monitoring
+![System Health Monitoring](docs/screenshots/06-system-health.png)
+
 Enterprise-grade React admin dashboard for the Ecommerce Platform ecosystem.
 
 This frontend provides operational visibility and management capabilities for the Spring Boot backend, simulating a real-world operations portal used by support, engineering, and business teams.

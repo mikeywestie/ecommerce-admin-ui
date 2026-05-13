@@ -14,27 +14,27 @@ const menuItems = [
   {
     icon: LayoutDashboard,
     label: "Dashboard",
-    path: "/",
+    path: "/admin",
   },
   {
     icon: ShoppingCart,
     label: "Orders",
-    path: "/orders",
+    path: "/admin/orders",
   },
   {
     icon: CreditCard,
     label: "Payments",
-    path: "/payments",
+    path: "/admin/payments",
   },
   {
     icon: Package,
     label: "Inventory",
-    path: "/inventory",
+    path: "/admin/inventory",
   },
   {
     icon: Activity,
     label: "System Health",
-    path: "/system-health",
+    path: "/admin/system-health",
   },
 ];
 
@@ -59,6 +59,7 @@ export default function Sidebar() {
           <NavLink
             key={item.label}
             to={item.path}
+            end={item.path === "/admin"}
             className={({ isActive }) =>
               `flex items-center gap-3 p-3 rounded-xl transition ${
                 isActive
