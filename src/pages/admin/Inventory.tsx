@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import type { InventoryItem } from "../types/Inventory";
+import type { InventoryItem } from "@/types/Inventory";
 import { getInventory } from "../../services/inventoryService";
 
 export default function Inventory() {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import StatCard from "../../components/StatCard";
 import { getDashboardSummary } from "../../services/dashboardService";
-import type { DashboardSummary } from "../types/DashboardSummary";
+import type { DashboardSummary } from "../../types/DashboardSummary";
 
 import {
   BarChart,
@@ -12,14 +12,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
-const salesData = [
-  { month: "Jan", sales: 4000 },
-  { month: "Feb", sales: 3000 },
-  { month: "Mar", sales: 5000 },
-  { month: "Apr", sales: 2780 },
-  { month: "May", sales: 5890 },
-];
 
 export default function Dashboard() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
@@ -116,7 +108,6 @@ export default function Dashboard() {
               <XAxis dataKey="status" stroke="#94a3b8" />
               <YAxis stroke="#94a3b8" allowDecimals={false} />
               <Tooltip />
-
               <Bar dataKey="count" fill="#3b82f6" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

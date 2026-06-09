@@ -1,4 +1,5 @@
-import { FormEvent, useState } from "react";
+import type { FormEvent } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { login, saveAuth } from "../../services/authService";
@@ -24,7 +25,12 @@ export default function Login() {
       });
 
       saveAuth(auth);
+
+      if (auth.role === "ADMIN") {
         navigate("/admin");
+      } else {
+        navigate("/customer/products");
+      }
     } catch {
       setError("Invalid email or password.");
     } finally {
@@ -35,8 +41,10 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-white">
       <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl">
-        <h1 className="text-3xl font-bold mb-2">Ecommerce Admin</h1>
-        <p className="text-slate-400 mb-8">Sign in to continue</p>
+        <h1 className="text-3xl font-bold mb-2">Ecommerce Platform</h1>
+        <p className="text-slate-400 mb-8">
+          Sign in to continue
+        </p>
 
         {error && (
           <div className="bg-red-500/20 border border-red-500 text-red-400 p-4 rounded-xl mb-4">

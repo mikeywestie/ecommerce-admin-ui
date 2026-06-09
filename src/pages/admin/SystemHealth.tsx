@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-import type { HealthStatus } from "../types/HealthStatus";
-import { getSystemHealth } from "../../services/systemHealthService";
+import type { HealthStatus } from "@/types/HealthStatus";
+import { getSystemHealth } from "@/services/systemHealthService";
 
 export default function SystemHealth() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
