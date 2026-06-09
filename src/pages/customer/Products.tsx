@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
-import { ShoppingCart, Package } from "lucide-react";
+import { Eye, Package, ShoppingCart } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import api from "../../services/api";
+
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1523275335684-37898b6baf30";
 
 type Product = {
   id: number;
   name: string;
-  description: string;
+  description?: string;
+  category?: string;
+  imageUrl?: string;
+  active?: boolean;
   price: number;
 };
 
@@ -81,63 +88,86 @@ export default function Products() {
     );
   }
 
+  const activeProducts = products.filter((product) => product.active !== false);
+
   return (
     <div className="space-y-8">
-      {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">
-          Browse Products
-        </h1>
+        <h1 className="text-3xl font-bold text-slate-900">Browse Products</h1>
         <p className="text-slate-500 mt-2">
-          Discover our latest products and add them to your cart.
+          Discover demo products, add them to your cart, and simulate a purchase.
         </p>
       </div>
 
-      {/* Empty State */}
-      {products.length === 0 && (
+      {activeProducts.length === 0 && (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
           <Package className="mx-auto h-12 w-12 text-slate-400 mb-4" />
           <h2 className="text-xl font-semibold text-slate-900">
             No Products Available
           </h2>
-          <p className="text-slate-500 mt-2">
-            Please check back later.
-          </p>
+          <p className="text-slate-500 mt-2">Please check back later.</p>
         </div>
       )}
 
-      {/* Product Grid */}
-      {products.length > 0 && (
+      {activeProducts.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {products.map((product) => (
+          {activeProducts.map((product) => (
             <div
               key={product.id}
-              className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition p-6 flex flex-col"
+              className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col"
             >
-              <div className="flex-1">
-                <h2 className="text-xl font-semibold text-slate-900">
-                  {product.name}
-                </h2>
-
-                <p className="text-slate-500 mt-3 line-clamp-3">
-                  {product.description || "No description available."}
-                </p>
-
-                <div className="mt-4 text-2xl font-bold text-blue-600">
-                  R{product.price.toFixed(2)}
-                </div>
+              <div className="h-48 bg-slate-100 overflow-hidden">
+                <img
+                  src={product.imageUrl || FALLBACK_IMAGE}
+                  alt={product.name}
+                  className="h-full w-full object-cover hover:scale-105 transition duration-300"
+                />
               </div>
 
-              <button
-                onClick={() => addToCart(product.id)}
-                disabled={addingProductId === product.id}
-                className="mt-6 w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white px-4 py-3 rounded-xl font-semibold transition"
-              >
-                <ShoppingCart size={18} />
-                {addingProductId === product.id
-                  ? "Adding..."
-                  : "Add to Cart"}
-              </button>
+              <div className="p-6 flex flex-col flex-1">
+                <div className="flex items-start justify-between gap-3">
+                  <span className="inline-flex rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-semibold">
+                    {product.category || "General"}
+                  </span>
+
+                  <span className="text-xs text-emerald-600 font-semibold">
+                    Active
+                  </span>
+                </div>
+
+                <div className="flex-1 mt-4">
+                  <h2 className="text-xl font-semibold text-slate-900">
+                    {product.name}
+                  </h2>
+
+                  <p className="text-slate-500 mt-3 line-clamp-3">
+                    {product.description || "No description available."}
+                  </p>
+
+                  <div className="mt-4 text-2xl font-bold text-blue-600">
+                    R{product.price.toFixed(2)}
+                  </div>
+                </div>
+
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <Link
+                    to={`/customer/products/${product.id}`}
+                    className="w-full flex items-center justify-center gap-2 border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-3 rounded-xl font-semibold transition"
+                  >
+                    <Eye size={18} />
+                    Details
+                  </Link>
+
+                  <button
+                    onClick={() => addToCart(product.id)}
+                    disabled={addingProductId === product.id}
+                    className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white px-4 py-3 rounded-xl font-semibold transition"
+                  >
+                    <ShoppingCart size={18} />
+                    {addingProductId === product.id ? "Adding..." : "Add"}
+                  </button>
+                </div>
+              </div>
             </div>
           ))}
         </div>

@@ -9,6 +9,7 @@ import Inventory from "./pages/admin/Inventory";
 import SystemHealth from "./pages/admin/SystemHealth";
 
 import Products from "./pages/customer/Products";
+import ProductDetails from "./pages/customer/ProductDetails";
 import Cart from "./pages/customer/Cart";
 import Checkout from "./pages/customer/Checkout";
 
@@ -48,6 +49,7 @@ function App() {
         >
           <Route index element={<Products />} />
           <Route path="products" element={<Products />} />
+          <Route path="products/:id" element={<ProductDetails />} />
           <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
         </Route>

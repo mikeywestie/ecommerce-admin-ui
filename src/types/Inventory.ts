@@ -1,6 +1,9 @@
 export type InventoryProduct = {
   id: number;
   name: string;
+  category?: string;
+  imageUrl?: string;
+  active?: boolean;
   price: number;
 };
 
