@@ -17,7 +17,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/ecommerce-admin-ui">
       <Routes>
         <Route path="/login" element={<Login />} />
 
