@@ -21,8 +21,6 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
 
-        <Route path="/login" element={<Login />} />
-
         <Route path="/" element={<Navigate to="/login" replace />} />
 
         <Route
@@ -53,6 +51,8 @@ function App() {
           <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
         </Route>
+
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );
