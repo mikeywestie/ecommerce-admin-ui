@@ -5,7 +5,7 @@ export type HealthComponent = {
 
 export type HealthStatus = {
   status: string;
-  components?: {
+  components: {
     db?: HealthComponent;
     diskSpace?: HealthComponent;
     livenessState?: HealthComponent;
