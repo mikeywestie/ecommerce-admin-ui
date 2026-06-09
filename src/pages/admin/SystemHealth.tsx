@@ -27,14 +27,8 @@ export default function SystemHealth() {
   }
 
   function getStatusStyle(status: string) {
-    if (status === "UP") {
-      return "bg-green-500/20 text-green-400";
-    }
-
-    if (status === "UNKNOWN") {
-      return "bg-yellow-500/20 text-yellow-400";
-    }
-
+    if (status === "UP") return "bg-green-500/20 text-green-400";
+    if (status === "UNKNOWN") return "bg-yellow-500/20 text-yellow-400";
     return "bg-red-500/20 text-red-400";
   }
 
@@ -87,21 +81,21 @@ export default function SystemHealth() {
   }
 
   const components = [
-    { name: "Application", status: health.status },
-    { name: "Database", status: health.components.db?.status ?? "UNKNOWN" },
+    { name: "Application", status: health.status ?? "UNKNOWN" },
+    { name: "Database", status: health.components?.db?.status ?? "UNKNOWN" },
     {
       name: "Disk Space",
-      status: health.components.diskSpace?.status ?? "UNKNOWN",
+      status: health.components?.diskSpace?.status ?? "UNKNOWN",
     },
     {
       name: "Liveness",
-      status: health.components.livenessState?.status ?? "UNKNOWN",
+      status: health.components?.livenessState?.status ?? "UNKNOWN",
     },
     {
       name: "Readiness",
-      status: health.components.readinessState?.status ?? "UNKNOWN",
+      status: health.components?.readinessState?.status ?? "UNKNOWN",
     },
-    { name: "Ping", status: health.components.ping?.status ?? "UNKNOWN" },
+    { name: "Ping", status: health.components?.ping?.status ?? "UNKNOWN" },
   ];
 
   return (
@@ -139,6 +133,13 @@ export default function SystemHealth() {
           </tbody>
         </table>
       </div>
+
+      {!health.components && (
+        <div className="mt-6 bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 rounded-2xl p-4 text-sm">
+          Detailed health components are not exposed by the production API. The
+          application status is still available.
+        </div>
+      )}
 
       {health.groups && health.groups.length > 0 && (
         <div className="mt-6 bg-slate-800 rounded-2xl p-6">
