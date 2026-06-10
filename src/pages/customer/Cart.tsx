@@ -77,7 +77,10 @@ export default function Cart() {
   async function updateQuantity(item: CartItem, quantity: number) {
     if (quantity < 1) return;
 
+    const isIncreasing = quantity > item.quantity;
+
     if (
+      isIncreasing &&
       item.availableQuantity !== undefined &&
       quantity > item.availableQuantity
     ) {
