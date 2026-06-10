@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowLeft, Package, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Minus, Package, Plus, ShoppingCart } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 
 import api from "../../services/api";
@@ -21,9 +21,11 @@ type Product = {
 export default function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
+  const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
     loadProduct();
@@ -36,8 +38,7 @@ export default function ProductDetails() {
 
       const response = await api.get<Product>(`/api/products/${id}`);
       setProduct(response.data);
-    } catch (err) {
-      console.error(err);
+    } catch {
       setError("Unable to load product details.");
     } finally {
       setLoading(false);
@@ -49,16 +50,17 @@ export default function ProductDetails() {
 
     try {
       setAdding(true);
+      setError("");
+      setSuccess("");
 
       await api.post("/api/cart/items", {
         productId: product.id,
-        quantity: 1,
+        quantity,
       });
 
-      alert("Product added to cart.");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to add product to cart.");
+      setSuccess("Product added to cart.");
+    } catch {
+      setError("Failed to add product to cart.");
     } finally {
       setAdding(false);
     }
@@ -72,7 +74,7 @@ export default function ProductDetails() {
     );
   }
 
-  if (error || !product) {
+  if (error && !product) {
     return (
       <div className="space-y-6">
         <Link
@@ -84,11 +86,13 @@ export default function ProductDetails() {
         </Link>
 
         <div className="bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-xl">
-          {error || "Product not found."}
+          {error}
         </div>
       </div>
     );
   }
+
+  if (!product) return null;
 
   return (
     <div className="space-y-6">
@@ -99,6 +103,18 @@ export default function ProductDetails() {
         <ArrowLeft size={18} />
         Back to products
       </Link>
+
+      {error && (
+        <div className="bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-xl">
+          {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="bg-emerald-500/10 border border-emerald-500 text-emerald-600 p-4 rounded-xl">
+          {success}
+        </div>
+      )}
 
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
         <div className="grid grid-cols-1 lg:grid-cols-2">
@@ -144,6 +160,26 @@ export default function ProductDetails() {
               <span>This is a demo product for the customer storefront.</span>
             </div>
 
+            <div className="mt-8 flex items-center gap-4">
+              <button
+                onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+                className="h-12 w-12 rounded-xl border border-slate-300 flex items-center justify-center hover:bg-slate-50"
+              >
+                <Minus size={18} />
+              </button>
+
+              <span className="w-12 text-center text-xl font-bold text-slate-900">
+                {quantity}
+              </span>
+
+              <button
+                onClick={() => setQuantity((value) => value + 1)}
+                className="h-12 w-12 rounded-xl border border-slate-300 flex items-center justify-center hover:bg-slate-50"
+              >
+                <Plus size={18} />
+              </button>
+            </div>
+
             <button
               onClick={addToCart}
               disabled={adding || product.active === false}
@@ -152,6 +188,13 @@ export default function ProductDetails() {
               <ShoppingCart size={20} />
               {adding ? "Adding..." : "Add to Cart"}
             </button>
+
+            <Link
+              to="/customer/cart"
+              className="mt-3 w-full flex items-center justify-center border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-4 rounded-xl font-semibold transition"
+            >
+              View Cart
+            </Link>
           </div>
         </div>
       </div>

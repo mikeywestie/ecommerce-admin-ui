@@ -12,6 +12,7 @@ import Products from "./pages/customer/Products";
 import ProductDetails from "./pages/customer/ProductDetails";
 import Cart from "./pages/customer/Cart";
 import Checkout from "./pages/customer/Checkout";
+import OrderSuccess from "./pages/customer/OrderSuccess";
 
 import Login from "./pages/auth/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -52,6 +53,7 @@ function App() {
           <Route path="products/:id" element={<ProductDetails />} />
           <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
+          <Route path="order-success" element={<OrderSuccess />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/login" replace />} />
