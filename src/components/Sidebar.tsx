@@ -1,45 +1,38 @@
 import {
-  LayoutDashboard,
-  ShoppingCart,
-  CreditCard,
-  Package,
   Activity,
+  CreditCard,
+  LayoutDashboard,
   LogOut,
+  Package,
+  ShoppingBag,
+  ShoppingCart,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import { logout } from "../services/authService";
 
-const menuItems = [
-  {
-    icon: LayoutDashboard,
-    label: "Dashboard",
-    path: "/admin",
-  },
-  {
-    icon: ShoppingCart,
-    label: "Orders",
-    path: "/admin/orders",
-  },
-  {
-    icon: CreditCard,
-    label: "Payments",
-    path: "/admin/payments",
-  },
-  {
-    icon: Package,
-    label: "Inventory",
-    path: "/admin/inventory",
-  },
-  {
-    icon: Activity,
-    label: "System Health",
-    path: "/admin/system-health",
-  },
+const adminMenuItems = [
+  { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
+  { icon: ShoppingCart, label: "Orders", path: "/admin/orders" },
+  { icon: CreditCard, label: "Payments", path: "/admin/payments" },
+  { icon: Package, label: "Inventory", path: "/admin/inventory" },
+  { icon: Activity, label: "System Health", path: "/admin/system-health" },
+  { icon: ShoppingBag, label: "Storefront", path: "/customer/products" },
+];
+
+const customerMenuItems = [
+  { icon: ShoppingBag, label: "Products", path: "/customer/products" },
+  { icon: ShoppingCart, label: "Cart", path: "/customer/cart" },
+  { icon: CreditCard, label: "Checkout", path: "/customer/checkout" },
 ];
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const role = localStorage.getItem("role");
+  const email = localStorage.getItem("email");
+
+  const isAdmin = role === "ADMIN";
+  const menuItems = isAdmin ? adminMenuItems : customerMenuItems;
 
   function handleLogout() {
     logout();
@@ -48,18 +41,26 @@ export default function Sidebar() {
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-slate-950 border-r border-slate-800 p-4 flex flex-col">
-      {/* Logo / Title */}
-      <h1 className="text-2xl font-bold mb-8 text-white">
-        Ecommerce Admin
-      </h1>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-white">
+          {isAdmin ? "Ecommerce Admin" : "Ecommerce Store"}
+        </h1>
 
-      {/* Navigation */}
+        <p className="text-xs text-slate-500 mt-2 truncate">
+          {email || "Signed in"}
+        </p>
+
+        <span className="mt-3 inline-flex rounded-full bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-300">
+          {isAdmin ? "Admin Portal" : "Customer Portal"}
+        </span>
+      </div>
+
       <nav className="space-y-2 flex-1 overflow-y-auto">
         {menuItems.map((item) => (
           <NavLink
             key={item.label}
             to={item.path}
-            end={item.path === "/admin"}
+            end={item.path === "/admin" || item.path === "/customer/products"}
             className={({ isActive }) =>
               `flex items-center gap-3 p-3 rounded-xl transition ${
                 isActive
@@ -74,7 +75,6 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Logout Button */}
       <div className="pt-4 border-t border-slate-800">
         <button
           onClick={handleLogout}
