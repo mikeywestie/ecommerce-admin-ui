@@ -1,6 +1,7 @@
 export type InventoryProduct = {
   id: number;
   name: string;
+  description?: string;
   category?: string;
   imageUrl?: string;
   active?: boolean;
@@ -12,4 +13,14 @@ export type InventoryItem = {
   product: InventoryProduct;
   quantityAvailable: number;
   inStock: boolean;
+};
+
+export type ProductFormPayload = {
+  name: string;
+  description: string;
+  category: string;
+  imageUrl: string;
+  active: boolean;
+  price: number;
+  initialStock?: number | null;
 };
