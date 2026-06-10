@@ -1,5 +1,13 @@
-import { useEffect, useState } from "react";
-import { ArrowLeft, Minus, Package, Plus, ShoppingCart } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  CheckCircle2,
+  Minus,
+  Package,
+  Plus,
+  ShoppingCart,
+} from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 
 import api from "../../services/api";
@@ -18,9 +26,25 @@ type Product = {
   createdAt?: string;
 };
 
+type InventoryResponse = {
+  inventoryId: number;
+  product: {
+    id: number;
+    name: string;
+    category?: string;
+    imageUrl?: string;
+    active?: boolean;
+    price: number;
+  };
+  quantityAvailable: number;
+  inStock: boolean;
+};
+
 export default function ProductDetails() {
   const { id } = useParams();
+
   const [product, setProduct] = useState<Product | null>(null);
+  const [inventory, setInventory] = useState<InventoryResponse | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
@@ -31,13 +55,82 @@ export default function ProductDetails() {
     loadProduct();
   }, [id]);
 
+  const availableQuantity = inventory?.quantityAvailable ?? 0;
+  const isInactive = product?.active === false;
+  const isOutOfStock = availableQuantity <= 0;
+  const canAddToCart =
+    !!product && !isInactive && !isOutOfStock && quantity <= availableQuantity;
+
+  const stockStatus = useMemo(() => {
+    if (isInactive) {
+      return {
+        label: "Unavailable",
+        message: "This product is no longer available.",
+        className: "bg-red-50 text-red-700 border-red-200",
+        icon: <AlertTriangle size={16} />,
+      };
+    }
+
+    if (isOutOfStock) {
+      return {
+        label: "Out of stock",
+        message: "This product is currently out of stock.",
+        className: "bg-red-50 text-red-700 border-red-200",
+        icon: <AlertTriangle size={16} />,
+      };
+    }
+
+    if (availableQuantity <= 5) {
+      return {
+        label: "Low stock",
+        message: `Only ${availableQuantity} left in stock.`,
+        className: "bg-yellow-50 text-yellow-700 border-yellow-200",
+        icon: <AlertTriangle size={16} />,
+      };
+    }
+
+    if (availableQuantity <= 10) {
+      return {
+        label: "Almost sold out",
+        message: `Almost sold out. ${availableQuantity} left.`,
+        className: "bg-yellow-50 text-yellow-700 border-yellow-200",
+        icon: <AlertTriangle size={16} />,
+      };
+    }
+
+    return {
+      label: "In stock",
+      message: `${availableQuantity} available.`,
+      className: "bg-emerald-50 text-emerald-700 border-emerald-200",
+      icon: <CheckCircle2 size={16} />,
+    };
+  }, [availableQuantity, isInactive, isOutOfStock]);
+
   async function loadProduct() {
     try {
       setLoading(true);
       setError("");
+      setSuccess("");
 
-      const response = await api.get<Product>(`/api/products/${id}`);
-      setProduct(response.data);
+      const productResponse = await api.get<Product>(`/api/products/${id}`);
+      setProduct(productResponse.data);
+
+      try {
+        const inventoryResponse = await api.get<InventoryResponse>(
+          `/api/inventory/${id}`
+        );
+        setInventory(inventoryResponse.data);
+
+        if (inventoryResponse.data.quantityAvailable <= 0) {
+          setQuantity(1);
+        } else {
+          setQuantity((current) =>
+            Math.min(Math.max(current, 1), inventoryResponse.data.quantityAvailable)
+          );
+        }
+      } catch {
+        setInventory(null);
+      }
     } catch {
       setError("Unable to load product details.");
     } finally {
@@ -45,8 +138,41 @@ export default function ProductDetails() {
     }
   }
 
+  function decreaseQuantity() {
+    setSuccess("");
+    setError("");
+    setQuantity((value) => Math.max(1, value - 1));
+  }
+
+  function increaseQuantity() {
+    setSuccess("");
+    setError("");
+
+    if (availableQuantity > 0 && quantity >= availableQuantity) {
+      setError(`Only ${availableQuantity} left in stock.`);
+      return;
+    }
+
+    setQuantity((value) => value + 1);
+  }
+
   async function addToCart() {
     if (!product) return;
+
+    if (isInactive) {
+      setError("This product is no longer available.");
+      return;
+    }
+
+    if (isOutOfStock) {
+      setError("This product is currently out of stock.");
+      return;
+    }
+
+    if (quantity > availableQuantity) {
+      setError(`Only ${availableQuantity} left in stock.`);
+      return;
+    }
 
     try {
       setAdding(true);
@@ -58,7 +184,8 @@ export default function ProductDetails() {
         quantity,
       });
 
-      setSuccess("Product added to cart.");
+      setSuccess(`${quantity} item${quantity === 1 ? "" : "s"} added to cart.`);
+      await loadProduct();
     } catch {
       setError("Failed to add product to cart.");
     } finally {
@@ -127,19 +254,16 @@ export default function ProductDetails() {
           </div>
 
           <div className="p-8 flex flex-col">
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex flex-wrap items-center gap-3 mb-4">
               <span className="inline-flex rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-sm font-semibold">
                 {product.category || "General"}
               </span>
 
               <span
-                className={`inline-flex rounded-full px-3 py-1 text-sm font-semibold ${
-                  product.active === false
-                    ? "bg-red-50 text-red-700"
-                    : "bg-emerald-50 text-emerald-700"
-                }`}
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-semibold ${stockStatus.className}`}
               >
-                {product.active === false ? "Inactive" : "Available"}
+                {stockStatus.icon}
+                {stockStatus.label}
               </span>
             </div>
 
@@ -155,38 +279,72 @@ export default function ProductDetails() {
               R{product.price.toFixed(2)}
             </div>
 
-            <div className="mt-8 rounded-2xl bg-slate-50 border border-slate-200 p-4 flex items-center gap-3 text-slate-600">
-              <Package className="h-5 w-5 text-slate-400" />
-              <span>This is a demo product for the customer storefront.</span>
+            <div className="mt-8 rounded-2xl bg-slate-50 border border-slate-200 p-4 flex items-start gap-3 text-slate-600">
+              <Package className="h-5 w-5 text-slate-400 mt-0.5" />
+              <div>
+                <p className="font-semibold text-slate-700">
+                  Live stock check
+                </p>
+                <p className="text-sm mt-1">{stockStatus.message}</p>
+              </div>
             </div>
 
-            <div className="mt-8 flex items-center gap-4">
-              <button
-                onClick={() => setQuantity((value) => Math.max(1, value - 1))}
-                className="h-12 w-12 rounded-xl border border-slate-300 flex items-center justify-center hover:bg-slate-50"
-              >
-                <Minus size={18} />
-              </button>
+            <div className="mt-8">
+              <p className="text-sm font-semibold text-slate-700 mb-3">
+                Quantity
+              </p>
 
-              <span className="w-12 text-center text-xl font-bold text-slate-900">
-                {quantity}
-              </span>
+              <div className="flex items-center rounded-xl border border-slate-300 bg-slate-50 p-1 w-fit">
+                <button
+                  type="button"
+                  onClick={decreaseQuantity}
+                  disabled={quantity <= 1 || adding || isOutOfStock}
+                  className="h-12 w-12 rounded-lg bg-white text-slate-900 shadow-sm flex items-center justify-center hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                  aria-label="Decrease quantity"
+                >
+                  <Minus size={18} strokeWidth={2.5} />
+                </button>
 
-              <button
-                onClick={() => setQuantity((value) => value + 1)}
-                className="h-12 w-12 rounded-xl border border-slate-300 flex items-center justify-center hover:bg-slate-50"
-              >
-                <Plus size={18} />
-              </button>
+                <div className="h-12 min-w-16 px-5 flex items-center justify-center text-xl font-bold text-slate-900">
+                  {quantity}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={increaseQuantity}
+                  disabled={
+                    adding ||
+                    isOutOfStock ||
+                    isInactive ||
+                    quantity >= availableQuantity
+                  }
+                  className="h-12 w-12 rounded-lg bg-white text-slate-900 shadow-sm flex items-center justify-center hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                  aria-label="Increase quantity"
+                >
+                  <Plus size={18} strokeWidth={2.5} />
+                </button>
+              </div>
+
+              {availableQuantity > 0 && (
+                <p className="text-sm text-slate-500 mt-2">
+                  Maximum available: {availableQuantity}
+                </p>
+              )}
             </div>
 
             <button
               onClick={addToCart}
-              disabled={adding || product.active === false}
+              disabled={adding || !canAddToCart}
               className="mt-8 w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed text-white px-4 py-4 rounded-xl font-semibold transition"
             >
               <ShoppingCart size={20} />
-              {adding ? "Adding..." : "Add to Cart"}
+              {adding
+                ? "Adding..."
+                : isOutOfStock
+                ? "Out of Stock"
+                : isInactive
+                ? "Unavailable"
+                : "Add to Cart"}
             </button>
 
             <Link
@@ -195,6 +353,14 @@ export default function ProductDetails() {
             >
               View Cart
             </Link>
+
+            <button
+              type="button"
+              onClick={loadProduct}
+              className="mt-3 w-full flex items-center justify-center border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-4 rounded-xl font-semibold transition"
+            >
+              Refresh Stock
+            </button>
           </div>
         </div>
       </div>
