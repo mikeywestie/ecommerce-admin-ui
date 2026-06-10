@@ -271,7 +271,7 @@ export default function Checkout() {
                   value={couponCode}
                   onChange={(event) => setCouponCode(event.target.value)}
                   placeholder="Enter coupon code"
-                  className="flex-1 rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-blue-500"
+                  className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-blue-500"
                 />
 
                 <button
