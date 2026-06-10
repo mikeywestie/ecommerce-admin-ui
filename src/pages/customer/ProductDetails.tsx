@@ -15,6 +15,13 @@ import api from "../../services/api";
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1523275335684-37898b6baf30";
 
+type StockStatus =
+  | "IN_STOCK"
+  | "ALMOST_SOLD_OUT"
+  | "LOW_STOCK"
+  | "OUT_OF_STOCK"
+  | "INACTIVE";
+
 type Product = {
   id: number;
   name: string;
@@ -23,28 +30,16 @@ type Product = {
   imageUrl?: string;
   active?: boolean;
   price: number;
+  availableQuantity?: number;
+  stockStatus?: StockStatus;
+  stockMessage?: string;
   createdAt?: string;
-};
-
-type InventoryResponse = {
-  inventoryId: number;
-  product: {
-    id: number;
-    name: string;
-    category?: string;
-    imageUrl?: string;
-    active?: boolean;
-    price: number;
-  };
-  quantityAvailable: number;
-  inStock: boolean;
 };
 
 export default function ProductDetails() {
   const { id } = useParams();
 
   const [product, setProduct] = useState<Product | null>(null);
-  const [inventory, setInventory] = useState<InventoryResponse | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
@@ -55,17 +50,19 @@ export default function ProductDetails() {
     loadProduct();
   }, [id]);
 
-  const availableQuantity = inventory?.quantityAvailable ?? 0;
-  const isInactive = product?.active === false;
-  const isOutOfStock = availableQuantity <= 0;
+  const availableQuantity = product?.availableQuantity ?? 0;
+  const stockStatus = product?.stockStatus ?? "OUT_OF_STOCK";
+  const isInactive = product?.active === false || stockStatus === "INACTIVE";
+  const isOutOfStock = stockStatus === "OUT_OF_STOCK" || availableQuantity <= 0;
+
   const canAddToCart =
     !!product && !isInactive && !isOutOfStock && quantity <= availableQuantity;
 
-  const stockStatus = useMemo(() => {
+  const stockDisplay = useMemo(() => {
     if (isInactive) {
       return {
         label: "Unavailable",
-        message: "This product is no longer available.",
+        message: product?.stockMessage ?? "This product is no longer available.",
         className: "bg-red-50 text-red-700 border-red-200",
         icon: <AlertTriangle size={16} />,
       };
@@ -74,25 +71,16 @@ export default function ProductDetails() {
     if (isOutOfStock) {
       return {
         label: "Out of stock",
-        message: "This product is currently out of stock.",
+        message: product?.stockMessage ?? "This product is currently out of stock.",
         className: "bg-red-50 text-red-700 border-red-200",
         icon: <AlertTriangle size={16} />,
       };
     }
 
-    if (availableQuantity <= 5) {
+    if (stockStatus === "LOW_STOCK" || stockStatus === "ALMOST_SOLD_OUT") {
       return {
-        label: "Low stock",
-        message: `Only ${availableQuantity} left in stock.`,
-        className: "bg-yellow-50 text-yellow-700 border-yellow-200",
-        icon: <AlertTriangle size={16} />,
-      };
-    }
-
-    if (availableQuantity <= 10) {
-      return {
-        label: "Almost sold out",
-        message: `Almost sold out. ${availableQuantity} left.`,
+        label: stockStatus === "LOW_STOCK" ? "Low stock" : "Almost sold out",
+        message: product?.stockMessage ?? `Only ${availableQuantity} left.`,
         className: "bg-yellow-50 text-yellow-700 border-yellow-200",
         icon: <AlertTriangle size={16} />,
       };
@@ -100,11 +88,11 @@ export default function ProductDetails() {
 
     return {
       label: "In stock",
-      message: `${availableQuantity} available.`,
+      message: product?.stockMessage ?? `${availableQuantity} available.`,
       className: "bg-emerald-50 text-emerald-700 border-emerald-200",
       icon: <CheckCircle2 size={16} />,
     };
-  }, [availableQuantity, isInactive, isOutOfStock]);
+  }, [availableQuantity, isInactive, isOutOfStock, product, stockStatus]);
 
   async function loadProduct() {
     try {
@@ -112,24 +100,15 @@ export default function ProductDetails() {
       setError("");
       setSuccess("");
 
-      const productResponse = await api.get<Product>(`/api/products/${id}`);
-      setProduct(productResponse.data);
+      const response = await api.get<Product>(`/api/products/${id}`);
+      setProduct(response.data);
 
-      try {
-        const inventoryResponse = await api.get<InventoryResponse>(
-          `/api/inventory/${id}`
-        );
-        setInventory(inventoryResponse.data);
+      const stock = response.data.availableQuantity ?? 0;
 
-        if (inventoryResponse.data.quantityAvailable <= 0) {
-          setQuantity(1);
-        } else {
-          setQuantity((current) =>
-            Math.min(Math.max(current, 1), inventoryResponse.data.quantityAvailable)
-          );
-        }
-      } catch {
-        setInventory(null);
+      if (stock <= 0) {
+        setQuantity(1);
+      } else {
+        setQuantity((current) => Math.min(Math.max(current, 1), stock));
       }
     } catch {
       setError("Unable to load product details.");
@@ -260,10 +239,10 @@ export default function ProductDetails() {
               </span>
 
               <span
-                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-semibold ${stockStatus.className}`}
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-semibold ${stockDisplay.className}`}
               >
-                {stockStatus.icon}
-                {stockStatus.label}
+                {stockDisplay.icon}
+                {stockDisplay.label}
               </span>
             </div>
 
@@ -285,7 +264,7 @@ export default function ProductDetails() {
                 <p className="font-semibold text-slate-700">
                   Live stock check
                 </p>
-                <p className="text-sm mt-1">{stockStatus.message}</p>
+                <p className="text-sm mt-1">{stockDisplay.message}</p>
               </div>
             </div>
 
@@ -298,7 +277,7 @@ export default function ProductDetails() {
                 <button
                   type="button"
                   onClick={decreaseQuantity}
-                  disabled={quantity <= 1 || adding || isOutOfStock}
+                  disabled={quantity <= 1 || adding || isOutOfStock || isInactive}
                   className="h-12 w-12 rounded-lg bg-white text-slate-900 shadow-sm flex items-center justify-center hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
                   aria-label="Decrease quantity"
                 >
