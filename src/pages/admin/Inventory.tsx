@@ -240,14 +240,14 @@ export default function Inventory() {
 
   if (loading) {
     return (
-      <div className="p-6">
-        <h1 className="text-3xl font-bold mb-6">Inventory</h1>
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold mb-6">Inventory</h1>
 
         <div className="space-y-4">
           {[1, 2, 3].map((item) => (
             <div
               key={item}
-              className="h-20 bg-slate-800 rounded-xl animate-pulse"
+              className="h-24 bg-slate-800 rounded-xl animate-pulse"
             />
           ))}
         </div>
@@ -256,10 +256,10 @@ export default function Inventory() {
   }
 
   return (
-    <div className="p-6">
+    <div>
       <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Inventory</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">Inventory</h1>
           <p className="text-slate-400 mt-2">
             Manage products, stock levels, catalog visibility, and product
             status.
@@ -268,7 +268,7 @@ export default function Inventory() {
 
         <button
           onClick={openCreateModal}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-500 transition"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-500 transition sm:w-auto"
         >
           <PackagePlus className="h-5 w-5" />
           Add Product
@@ -340,7 +340,111 @@ export default function Inventory() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl bg-slate-800">
+      <div className="space-y-4 md:hidden">
+        {filteredInventory.map((item) => (
+          <div
+            key={item.inventoryId}
+            className="rounded-2xl border border-slate-700 bg-slate-800 p-4"
+          >
+            <div className="flex gap-4">
+              <img
+                src={item.product.imageUrl || FALLBACK_IMAGE}
+                alt={item.product.name}
+                className="h-20 w-20 shrink-0 rounded-xl object-cover bg-slate-700"
+              />
+
+              <div className="min-w-0 flex-1">
+                <h3 className="font-semibold text-white break-words">
+                  {item.product.name}
+                </h3>
+
+                <p className="text-sm text-slate-400">
+                  {item.product.category || "General"}
+                </p>
+
+                <p className="mt-2 text-xl font-bold text-blue-400">
+                  R {item.product.price.toFixed(2)}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <div>
+                <p className="text-xs text-slate-500">Quantity</p>
+                <p className="font-semibold text-white">
+                  {item.quantityAvailable}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs text-slate-500">Product ID</p>
+                <p className="text-white">{item.product.id}</p>
+              </div>
+
+              <div>
+                <p className="text-xs text-slate-500">Product Status</p>
+                <span
+                  className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                    item.product.active === false
+                      ? "bg-red-500/20 text-red-400"
+                      : "bg-green-500/20 text-green-400"
+                  }`}
+                >
+                  {item.product.active === false ? "Inactive" : "Active"}
+                </span>
+              </div>
+
+              <div>
+                <p className="text-xs text-slate-500">Stock Status</p>
+                <span
+                  className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getStockStyle(
+                    item.quantityAvailable
+                  )}`}
+                >
+                  {getStockLabel(item.quantityAvailable)}
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-2">
+              <button
+                type="button"
+                onClick={() => openEditModal(item)}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-700 px-4 py-3 font-semibold text-white hover:bg-slate-600"
+              >
+                <Edit className="h-4 w-4" />
+                Edit Product
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleQuickStockUpdate(item)}
+                className="rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-500"
+              >
+                Update Stock
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleObsolete(item)}
+                disabled={item.product.active === false}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 font-semibold text-white hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Archive className="h-4 w-4" />
+                Mark Obsolete
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {filteredInventory.length === 0 && (
+          <div className="rounded-2xl bg-slate-800 p-6 text-center text-slate-400">
+            No inventory found.
+          </div>
+        )}
+      </div>
+
+      <div className="hidden overflow-hidden rounded-2xl bg-slate-800 md:block">
         <table className="w-full">
           <thead className="bg-slate-900">
             <tr>
@@ -453,10 +557,10 @@ export default function Inventory() {
       </div>
 
       {modalMode && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="w-full max-w-3xl rounded-2xl border border-slate-700 bg-slate-900 p-6 shadow-2xl">
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-2xl font-bold">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 md:items-center">
+          <div className="w-full max-w-3xl rounded-2xl border border-slate-700 bg-slate-900 p-5 shadow-2xl md:p-6">
+            <div className="mb-6 flex items-center justify-between gap-4">
+              <h2 className="text-xl md:text-2xl font-bold">
                 {modalMode === "create" ? "Add Product" : "Edit Product"}
               </h2>
 
@@ -574,7 +678,7 @@ export default function Inventory() {
                 </label>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4">
+              <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={closeModal}
@@ -586,7 +690,7 @@ export default function Inventory() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-500 disabled:opacity-60"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-500 disabled:opacity-60"
                 >
                   <Save className="h-5 w-5" />
                   {saving ? "Saving..." : "Save"}
