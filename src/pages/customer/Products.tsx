@@ -4,15 +4,12 @@ import { Link } from "react-router-dom";
 
 import api from "../../services/api";
 
-const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1523275335684-37898b6baf30";
-
 type Product = {
   id: number;
   name: string;
-  description?: string;
-  category?: string;
-  imageUrl?: string;
+  description?: string | null;
+  category?: string | null;
+  imageUrl?: string | null;
   active?: boolean;
   price: number;
 };
@@ -25,6 +22,40 @@ type PageResponse<T> = {
   totalPages: number;
   last: boolean;
 };
+
+function getSearchText(product: Product) {
+  return `${product.name ?? ""} ${product.category ?? ""} ${
+    product.description ?? ""
+  }`.toLowerCase();
+}
+
+function getProductDescription(product: Product) {
+  const description = product.description?.trim();
+
+  if (description) {
+    return description;
+  }
+
+  return "A demo store product ready to add to cart and use in the checkout flow.";
+}
+
+async function enrichProducts(products: Product[]) {
+  const settledProducts = await Promise.allSettled(
+    products.map(async (product) => {
+      const response = await api.get<Product>(`/api/products/${product.id}`);
+      return {
+        ...product,
+        ...response.data,
+        description: response.data.description ?? product.description,
+        imageUrl: response.data.imageUrl ?? product.imageUrl,
+      };
+    })
+  );
+
+  return settledProducts.map((result, index) =>
+    result.status === "fulfilled" ? result.value : products[index]
+  );
+}
 
 export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -46,7 +77,8 @@ export default function Products() {
         "/api/products?page=0&size=20&sortBy=name&sortDir=asc"
       );
 
-      setProducts(response.data.content);
+      const enrichedProducts = await enrichProducts(response.data.content);
+      setProducts(enrichedProducts);
     } catch (err) {
       console.error(err);
       setError("Unable to load products.");
@@ -140,11 +172,17 @@ export default function Products() {
               className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition overflow-hidden flex flex-col"
             >
               <div className="h-48 bg-slate-100 overflow-hidden">
-                <img
-                  src={product.imageUrl || FALLBACK_IMAGE}
-                  alt={product.name}
-                  className="h-full w-full object-cover hover:scale-105 transition duration-300"
-                />
+                {product.imageUrl ? (
+                  <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                    className="h-full w-full object-cover hover:scale-105 transition duration-300"
+                  />
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center bg-slate-100 text-slate-400 text-sm font-medium">
+                    No image available yet
+                  </div>
+                )}
               </div>
 
               <div className="p-6 flex flex-col flex-1">
@@ -163,8 +201,8 @@ export default function Products() {
                     {product.name}
                   </h2>
 
-                  <p className="text-slate-500 mt-3 line-clamp-3">
-                    {product.description || "No description available."}
+                  <p className="text-slate-500 mt-3 line-clamp-3 min-h-[4.5rem]">
+                    {getProductDescription(product)}
                   </p>
 
                   <div className="mt-4 text-2xl font-bold text-blue-600">
@@ -182,6 +220,7 @@ export default function Products() {
                   </Link>
 
                   <button
+                    type="button"
                     onClick={() => addToCart(product.id)}
                     disabled={addingProductId === product.id}
                     className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white px-4 py-3 rounded-xl font-semibold transition"

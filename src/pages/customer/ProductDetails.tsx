@@ -12,9 +12,6 @@ import { Link, useParams } from "react-router-dom";
 
 import api from "../../services/api";
 
-const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1523275335684-37898b6baf30";
-
 type StockStatus =
   | "IN_STOCK"
   | "ALMOST_SOLD_OUT"
@@ -25,9 +22,9 @@ type StockStatus =
 type Product = {
   id: number;
   name: string;
-  description?: string;
-  category?: string;
-  imageUrl?: string;
+  description?: string | null;
+  category?: string | null;
+  imageUrl?: string | null;
   active?: boolean;
   price: number;
   availableQuantity?: number;
@@ -35,6 +32,22 @@ type Product = {
   stockMessage?: string;
   createdAt?: string;
 };
+
+function getSearchText(product: Product) {
+  return `${product.name ?? ""} ${product.category ?? ""} ${
+    product.description ?? ""
+  }`.toLowerCase();
+}
+
+function getProductDescription(product: Product) {
+  const description = product.description?.trim();
+
+  if (description) {
+    return description;
+  }
+
+  return "A demo store product ready to add to cart and use in the checkout flow.";
+}
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -225,11 +238,17 @@ export default function ProductDetails() {
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           <div className="bg-slate-100 min-h-[360px]">
-            <img
-              src={product.imageUrl || FALLBACK_IMAGE}
-              alt={product.name}
-              className="h-full w-full object-cover"
-            />
+            {product.imageUrl ? (
+              <img
+                src={product.imageUrl}
+                alt={product.name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center bg-slate-100 text-slate-400 text-lg font-medium">
+                No image available yet
+              </div>
+            )}
           </div>
 
           <div className="p-8 flex flex-col">
@@ -251,7 +270,7 @@ export default function ProductDetails() {
             </h1>
 
             <p className="text-slate-500 mt-4 leading-7">
-              {product.description || "No description available."}
+              {getProductDescription(product)}
             </p>
 
             <div className="mt-8 text-4xl font-bold text-blue-600">
@@ -312,6 +331,7 @@ export default function ProductDetails() {
             </div>
 
             <button
+              type="button"
               onClick={addToCart}
               disabled={adding || !canAddToCart}
               className="mt-8 w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed text-white px-4 py-4 rounded-xl font-semibold transition"

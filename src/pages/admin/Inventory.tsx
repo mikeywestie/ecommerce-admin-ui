@@ -19,9 +19,6 @@ import {
   updateProduct,
 } from "../../services/inventoryService";
 
-const FALLBACK_IMAGE =
-  "https://images.unsplash.com/photo-1523275335684-37898b6baf30";
-
 const emptyForm: ProductFormPayload = {
   name: "",
   description: "",
@@ -33,6 +30,44 @@ const emptyForm: ProductFormPayload = {
 };
 
 type ModalMode = "create" | "edit" | null;
+
+function ProductImage({
+  imageUrl,
+  productName,
+  size,
+}: {
+  imageUrl?: string | null;
+  productName: string;
+  size: "mobile" | "desktop";
+}) {
+  if (imageUrl?.trim()) {
+    return (
+      <img
+        src={imageUrl}
+        alt={productName}
+        className={
+          size === "mobile"
+            ? "h-20 w-20 shrink-0 rounded-xl object-cover bg-slate-700"
+            : "h-14 w-14 shrink-0 rounded-xl object-cover bg-slate-700"
+        }
+      />
+    );
+  }
+
+  return (
+    <div
+      className={
+        size === "mobile"
+          ? "h-20 w-20 shrink-0 rounded-xl bg-slate-700 flex items-center justify-center p-2 text-center text-[10px] font-semibold uppercase tracking-wide text-slate-400"
+          : "h-14 w-14 shrink-0 rounded-xl bg-slate-700 flex items-center justify-center p-1 text-center text-[9px] font-semibold uppercase tracking-wide text-slate-400"
+      }
+      aria-label={`No image available for ${productName}`}
+      title="No image available yet"
+    >
+      No Image
+    </div>
+  );
+}
 
 export default function Inventory() {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
@@ -87,7 +122,8 @@ export default function Inventory() {
       const matchesSearch =
         !query ||
         product.name.toLowerCase().includes(query) ||
-        (product.category || "").toLowerCase().includes(query);
+        (product.category || "").toLowerCase().includes(query) ||
+        (product.description || "").toLowerCase().includes(query);
 
       const matchesCategory =
         categoryFilter === "ALL" ||
@@ -163,6 +199,7 @@ export default function Inventory() {
       if (modalMode === "create") {
         await createProduct({
           ...form,
+          imageUrl: form.imageUrl?.trim() || "",
           initialStock: form.initialStock ?? 0,
         });
 
@@ -172,6 +209,7 @@ export default function Inventory() {
       if (modalMode === "edit" && selectedItem) {
         await updateProduct(selectedItem.product.id, {
           ...form,
+          imageUrl: form.imageUrl?.trim() || "",
           initialStock: null,
         });
 
@@ -267,6 +305,7 @@ export default function Inventory() {
         </div>
 
         <button
+          type="button"
           onClick={openCreateModal}
           className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-500 transition sm:w-auto"
         >
@@ -299,7 +338,7 @@ export default function Inventory() {
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search product or category..."
+              placeholder="Search product, description or category..."
               className="w-full rounded-xl border border-slate-700 bg-slate-900 py-3 pl-10 pr-4 text-white outline-none focus:border-blue-500"
             />
           </div>
@@ -347,10 +386,10 @@ export default function Inventory() {
             className="rounded-2xl border border-slate-700 bg-slate-800 p-4"
           >
             <div className="flex gap-4">
-              <img
-                src={item.product.imageUrl || FALLBACK_IMAGE}
-                alt={item.product.name}
-                className="h-20 w-20 shrink-0 rounded-xl object-cover bg-slate-700"
+              <ProductImage
+                imageUrl={item.product.imageUrl}
+                productName={item.product.name}
+                size="mobile"
               />
 
               <div className="min-w-0 flex-1">
@@ -361,6 +400,12 @@ export default function Inventory() {
                 <p className="text-sm text-slate-400">
                   {item.product.category || "General"}
                 </p>
+
+                {item.product.description && (
+                  <p className="mt-1 line-clamp-2 text-xs text-slate-500">
+                    {item.product.description}
+                  </p>
+                )}
 
                 <p className="mt-2 text-xl font-bold text-blue-400">
                   R {item.product.price.toFixed(2)}
@@ -466,10 +511,10 @@ export default function Inventory() {
               >
                 <td className="p-4">
                   <div className="flex items-center gap-4">
-                    <img
-                      src={item.product.imageUrl || FALLBACK_IMAGE}
-                      alt={item.product.name}
-                      className="h-14 w-14 rounded-xl object-cover bg-slate-700"
+                    <ProductImage
+                      imageUrl={item.product.imageUrl}
+                      productName={item.product.name}
+                      size="desktop"
                     />
 
                     <div>
@@ -479,6 +524,11 @@ export default function Inventory() {
                       <p className="text-xs text-slate-400">
                         Product ID: {item.product.id}
                       </p>
+                      {item.product.description && (
+                        <p className="mt-1 max-w-xs truncate text-xs text-slate-500">
+                          {item.product.description}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </td>
@@ -518,6 +568,7 @@ export default function Inventory() {
                 <td className="p-4">
                   <div className="flex justify-end gap-2">
                     <button
+                      type="button"
                       onClick={() => openEditModal(item)}
                       className="inline-flex items-center gap-1 rounded-lg bg-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-600"
                     >
@@ -526,6 +577,7 @@ export default function Inventory() {
                     </button>
 
                     <button
+                      type="button"
                       onClick={() => handleQuickStockUpdate(item)}
                       className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-500"
                     >
@@ -533,6 +585,7 @@ export default function Inventory() {
                     </button>
 
                     <button
+                      type="button"
                       onClick={() => handleObsolete(item)}
                       disabled={item.product.active === false}
                       className="inline-flex items-center gap-1 rounded-lg bg-red-600 px-3 py-2 text-sm text-white hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
@@ -565,6 +618,7 @@ export default function Inventory() {
               </h2>
 
               <button
+                type="button"
                 onClick={closeModal}
                 className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white"
               >
@@ -647,6 +701,7 @@ export default function Inventory() {
                     onChange={(event) =>
                       setForm({ ...form, imageUrl: event.target.value })
                     }
+                    placeholder="Optional. Leave blank to show No Image."
                     className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none focus:border-blue-500"
                   />
                 </div>
