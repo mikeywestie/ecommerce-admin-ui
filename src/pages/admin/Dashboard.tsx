@@ -17,6 +17,7 @@ export default function Dashboard() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [lastUpdated, setLastUpdated] = useState("");
 
   useEffect(() => {
     loadDashboardSummary();
@@ -29,6 +30,7 @@ export default function Dashboard() {
 
       const data = await getDashboardSummary();
       setSummary(data);
+      setLastUpdated(new Date().toLocaleString());
     } catch {
       setError("Failed to load dashboard summary.");
     } finally {
@@ -85,6 +87,23 @@ export default function Dashboard() {
 
   return (
     <div className="p-6 space-y-6">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold">Dashboard</h1>
+          <p className="text-slate-400 mt-1">Admin performance overview.</p>
+        </div>
+
+        {lastUpdated && (
+          <button
+            onClick={loadDashboardSummary}
+            className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-left text-sm text-slate-300 hover:bg-slate-700 md:w-auto"
+          >
+            <span className="block text-xs text-slate-500">Last updated</span>
+            {lastUpdated}
+          </button>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         {stats.map((stat) => (
           <StatCard key={stat.title} title={stat.title} value={stat.value} />
@@ -102,13 +121,26 @@ export default function Dashboard() {
       <div className="bg-slate-800 p-6 rounded-2xl">
         <h2 className="text-2xl font-bold mb-6">Order Status Overview</h2>
 
-        <div className="h-96">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-96 min-h-[384px] w-full">
+          <ResponsiveContainer width="100%" height={384}>
             <BarChart data={orderStatusData}>
               <XAxis dataKey="status" stroke="#94a3b8" />
               <YAxis stroke="#94a3b8" allowDecimals={false} />
-              <Tooltip />
-              <Bar dataKey="count" fill="#3b82f6" radius={[8, 8, 0, 0]} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#1e293b",
+                  border: "1px solid #334155",
+                  borderRadius: "12px",
+                  color: "#ffffff",
+                }}
+                labelStyle={{ color: "#ffffff" }}
+              />
+              <Bar
+                dataKey="count"
+                fill="#3b82f6"
+                radius={[8, 8, 0, 0]}
+                isAnimationActive={false}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>

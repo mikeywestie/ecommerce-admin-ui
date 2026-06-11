@@ -1,5 +1,6 @@
 import {
   Activity,
+  BadgePercent,
   CreditCard,
   LayoutDashboard,
   LogOut,
@@ -17,6 +18,7 @@ const adminMenuItems = [
   { icon: ShoppingCart, label: "Orders", path: "/admin/orders" },
   { icon: CreditCard, label: "Payments", path: "/admin/payments" },
   { icon: Package, label: "Inventory", path: "/admin/inventory" },
+  { icon: BadgePercent, label: "Coupons", path: "/admin/coupons" },
   { icon: Activity, label: "System Health", path: "/admin/system-health" },
   { icon: ShoppingBag, label: "Storefront", path: "/customer/products" },
 ];

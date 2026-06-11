@@ -6,6 +6,7 @@ import Dashboard from "./pages/admin/Dashboard";
 import Orders from "./pages/admin/Orders";
 import Payments from "./pages/admin/Payments";
 import Inventory from "./pages/admin/Inventory";
+import Coupons from "./pages/admin/Coupons";
 import SystemHealth from "./pages/admin/SystemHealth";
 
 import Products from "./pages/customer/Products";
@@ -37,6 +38,7 @@ function App() {
           <Route path="orders" element={<Orders />} />
           <Route path="payments" element={<Payments />} />
           <Route path="inventory" element={<Inventory />} />
+          <Route path="coupons" element={<Coupons />} />
           <Route path="system-health" element={<SystemHealth />} />
         </Route>
 

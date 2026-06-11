@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Eye, Package, ShoppingCart } from "lucide-react";
+import { Eye, Package, ShoppingCart, X } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import api from "../../services/api";
@@ -30,6 +30,7 @@ export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [addingProductId, setAddingProductId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -57,16 +58,18 @@ export default function Products() {
   async function addToCart(productId: number) {
     try {
       setAddingProductId(productId);
+      setError("");
+      setSuccess("");
 
       await api.post("/api/cart/items", {
         productId,
         quantity: 1,
       });
 
-      alert("Product added to cart.");
+      setSuccess("Product added to cart.");
     } catch (err) {
       console.error(err);
-      alert("Failed to add product to cart.");
+      setError("Failed to add product to cart.");
     } finally {
       setAddingProductId(null);
     }
@@ -76,14 +79,6 @@ export default function Products() {
     return (
       <div className="flex items-center justify-center py-20 text-slate-500">
         Loading products...
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-xl">
-        {error}
       </div>
     );
   }
@@ -98,6 +93,34 @@ export default function Products() {
           Discover demo products, add them to your cart, and simulate a purchase.
         </p>
       </div>
+
+      {success && (
+        <div className="flex items-center justify-between gap-4 bg-green-500/10 border border-green-500 text-green-600 p-4 rounded-xl">
+          <span>{success}</span>
+          <button
+            type="button"
+            onClick={() => setSuccess("")}
+            className="text-green-700 hover:text-green-900"
+            aria-label="Dismiss success message"
+          >
+            <X size={18} />
+          </button>
+        </div>
+      )}
+
+      {error && (
+        <div className="flex items-center justify-between gap-4 bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-xl">
+          <span>{error}</span>
+          <button
+            type="button"
+            onClick={() => setError("")}
+            className="text-red-500 hover:text-red-700"
+            aria-label="Dismiss error message"
+          >
+            <X size={18} />
+          </button>
+        </div>
+      )}
 
       {activeProducts.length === 0 && (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">

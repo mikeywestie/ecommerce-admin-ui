@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import type { HealthStatus } from "@/types/HealthStatus";
 import { getSystemHealth } from "@/services/systemHealthService";
 
+type DisplayStatus = "UP" | "DOWN" | "OUT_OF_SERVICE" | "NOT_EXPOSED";
+
 export default function SystemHealth() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -26,10 +28,15 @@ export default function SystemHealth() {
     }
   }
 
-  function getStatusStyle(status: string) {
+  function getStatusStyle(status: DisplayStatus | string) {
     if (status === "UP") return "bg-green-500/20 text-green-400";
-    if (status === "UNKNOWN") return "bg-yellow-500/20 text-yellow-400";
+    if (status === "NOT_EXPOSED") return "bg-slate-500/20 text-slate-300";
     return "bg-red-500/20 text-red-400";
+  }
+
+  function formatStatus(status: DisplayStatus | string) {
+    if (status === "NOT_EXPOSED") return "Restricted in Production";
+    return status;
   }
 
   if (error) {
@@ -80,27 +87,49 @@ export default function SystemHealth() {
     );
   }
 
+  const productionDetailsHidden = !health.components;
+
   const components = [
-    { name: "Application", status: health.status ?? "UNKNOWN" },
-    { name: "Database", status: health.components?.db?.status ?? "UNKNOWN" },
+    { name: "Application", status: health.status ?? "NOT_EXPOSED" },
+    {
+      name: "Database",
+      status: health.components?.db?.status ?? "NOT_EXPOSED",
+    },
     {
       name: "Disk Space",
-      status: health.components?.diskSpace?.status ?? "UNKNOWN",
+      status: health.components?.diskSpace?.status ?? "NOT_EXPOSED",
     },
     {
       name: "Liveness",
-      status: health.components?.livenessState?.status ?? "UNKNOWN",
+      status: health.components?.livenessState?.status ?? "NOT_EXPOSED",
     },
     {
       name: "Readiness",
-      status: health.components?.readinessState?.status ?? "UNKNOWN",
+      status: health.components?.readinessState?.status ?? "NOT_EXPOSED",
     },
-    { name: "Ping", status: health.components?.ping?.status ?? "UNKNOWN" },
+    {
+      name: "Ping",
+      status: health.components?.ping?.status ?? "NOT_EXPOSED",
+    },
   ];
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">System Health</h1>
+      <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">System Health</h1>
+          <p className="mt-2 text-slate-400">
+            Live API availability and production health visibility.
+          </p>
+        </div>
+
+        <button
+          onClick={loadSystemHealth}
+          className="w-full rounded-xl bg-slate-700 px-4 py-3 font-semibold text-slate-200 hover:bg-slate-600 md:w-auto"
+        >
+          Refresh
+        </button>
+      </div>
 
       <div className="bg-slate-800 rounded-2xl overflow-hidden">
         <table className="w-full">
@@ -121,11 +150,11 @@ export default function SystemHealth() {
 
                 <td className="p-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusStyle(
+                    className={`inline-flex px-3 py-1 rounded-full text-sm font-semibold ${getStatusStyle(
                       component.status
                     )}`}
                   >
-                    {component.status}
+                    {formatStatus(component.status)}
                   </span>
                 </td>
               </tr>
@@ -134,10 +163,10 @@ export default function SystemHealth() {
         </table>
       </div>
 
-      {!health.components && (
+      {productionDetailsHidden && (
         <div className="mt-6 bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 rounded-2xl p-4 text-sm">
-          Detailed health components are not exposed by the production API. The
-          application status is still available.
+          Detailed component health is intentionally restricted in production.
+          The public health endpoint confirms the application is available.
         </div>
       )}
 
