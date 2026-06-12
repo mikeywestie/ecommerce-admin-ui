@@ -6,6 +6,11 @@ export async function getOrders(): Promise<Order[]> {
   return response.data;
 }
 
+export async function getMyOrders(): Promise<Order[]> {
+  const response = await api.get("/api/orders/my-orders");
+  return response.data;
+}
+
 export async function cancelPaidOrder(orderId: number): Promise<Order> {
   const response = await api.post(`/api/orders/${orderId}/cancel-refund`);
   return response.data;

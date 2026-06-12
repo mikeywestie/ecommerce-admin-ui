@@ -6,7 +6,7 @@ import Notice from "@/components/ui/Notice";
 import PaginationControls from "@/components/ui/PaginationControls";
 import StatusBadge from "@/components/ui/StatusBadge";
 import type { Order } from "@/types/Order";
-import { cancelPaidOrder, getOrders } from "@/services/orderService";
+import { cancelPaidOrder, getMyOrders } from "@/services/orderService";
 
 function getStatusTone(status: Order["status"]) {
   if (status === "PAID") return "green";
@@ -24,8 +24,6 @@ export default function CustomerOrders() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const email = localStorage.getItem("email");
-
   useEffect(() => {
     loadOrders();
   }, []);
@@ -35,10 +33,10 @@ export default function CustomerOrders() {
       setLoading(true);
       setError("");
 
-      const data = await getOrders();
+      const data = await getMyOrders();
       setOrders(data);
     } catch {
-      setError("Unable to load order history.");
+      setError("Unable to load your order history.");
     } finally {
       setLoading(false);
     }
@@ -69,13 +67,11 @@ export default function CustomerOrders() {
   }
 
   const visibleOrders = useMemo(() => {
-    return [...orders]
-      .filter((order) => !email || order.customerEmail === email)
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-  }, [email, orders]);
+    return [...orders].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }, [orders]);
 
   const paginatedOrders = visibleOrders.slice(
     (currentPage - 1) * pageSize,
@@ -95,8 +91,7 @@ export default function CustomerOrders() {
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <h1 className="text-3xl font-bold text-slate-900">Order History</h1>
         <p className="mt-2 text-slate-500">
-          Open an order to review the items. Paid orders can be cancelled once
-          the backend refund simulation endpoint is available.
+          These are only the orders linked to your signed-in customer account.
         </p>
       </div>
 
