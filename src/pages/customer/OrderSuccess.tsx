@@ -1,4 +1,4 @@
-import { CheckCircle2, ShoppingBag } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ShoppingBag } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 type OrderResponse = {
@@ -14,17 +14,24 @@ export default function OrderSuccess() {
   const location = useLocation();
   const order = location.state?.order as OrderResponse | undefined;
 
+  const isPaymentFailed = order?.status === "PAYMENT_FAILED";
+
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-sm">
-      <CheckCircle2 className="mx-auto h-16 w-16 text-emerald-500 mb-4" />
+      {isPaymentFailed ? (
+        <AlertTriangle className="mx-auto h-16 w-16 text-red-500 mb-4" />
+      ) : (
+        <CheckCircle2 className="mx-auto h-16 w-16 text-emerald-500 mb-4" />
+      )}
 
       <h1 className="text-3xl font-bold text-slate-900">
-        Order Created Successfully
+        {isPaymentFailed ? "Payment Failed" : "Order Created Successfully"}
       </h1>
 
       <p className="text-slate-500 mt-3">
-        Your demo order has been created. Inventory and admin order data should
-        update after checkout.
+        {isPaymentFailed
+          ? "Your demo order was created, but the simulated payment failed. This is useful for demonstrating failed payment handling."
+          : "Your demo order has been created. Inventory and admin order data should update after checkout."}
       </p>
 
       {order && (
@@ -36,7 +43,11 @@ export default function OrderSuccess() {
 
           <div className="flex justify-between py-2">
             <span className="text-slate-500">Status</span>
-            <span className="font-semibold text-slate-900">
+            <span
+              className={`font-semibold ${
+                isPaymentFailed ? "text-red-600" : "text-slate-900"
+              }`}
+            >
               {order.status}
             </span>
           </div>
@@ -73,10 +84,10 @@ export default function OrderSuccess() {
         </Link>
 
         <Link
-          to="/admin/orders"
+          to="/customer/orders"
           className="inline-flex items-center justify-center border border-slate-300 hover:bg-slate-50 text-slate-700 px-5 py-3 rounded-xl font-semibold transition"
         >
-          View Admin Orders
+          View Order History
         </Link>
       </div>
     </div>
