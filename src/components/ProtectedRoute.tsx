@@ -6,12 +6,24 @@ type ProtectedRouteProps = {
   allowedRoles?: string[];
 };
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+export default function ProtectedRoute({
+  children,
+  allowedRoles = [],
+}: ProtectedRouteProps) {
   const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
 
   if (!token) {
     return <Navigate to="/login" replace />;
   }
 
-  return children;
+  if (allowedRoles.length > 0 && (!role || !allowedRoles.includes(role))) {
+    if (role === "CUSTOMER") {
+      return <Navigate to="/customer/products" replace />;
+    }
+
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
 }

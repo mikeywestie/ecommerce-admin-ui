@@ -2,6 +2,7 @@ import {
   Activity,
   BadgePercent,
   CreditCard,
+  History,
   LayoutDashboard,
   LogOut,
   Package,
@@ -27,6 +28,7 @@ const customerMenuItems = [
   { icon: ShoppingBag, label: "Products", path: "/customer/products" },
   { icon: ShoppingCart, label: "Cart", path: "/customer/cart" },
   { icon: CreditCard, label: "Checkout", path: "/customer/checkout" },
+  { icon: History, label: "Order History", path: "/customer/orders" },
 ];
 
 type SidebarProps = {
@@ -60,7 +62,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       )}
 
       <aside
-        className={`fixed left-0 top-0 z-50 h-screen w-72 max-w-[82vw] bg-slate-950 border-r border-slate-800 p-4 flex flex-col transform transition-transform duration-300 lg:w-64 lg:max-w-none ${
+        className={`fixed left-0 top-0 z-50 flex h-screen w-72 max-w-[82vw] transform flex-col border-r border-slate-800 bg-slate-950 p-4 transition-transform duration-300 lg:w-64 lg:max-w-none ${
           open ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0`}
       >
@@ -70,7 +72,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
               {isAdmin ? "Ecommerce Admin" : "Ecommerce Store"}
             </h1>
 
-            <p className="text-xs text-slate-500 mt-2 truncate">
+            <p className="mt-2 truncate text-xs text-slate-500">
               {email || "Signed in"}
             </p>
 
@@ -82,14 +84,14 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           <button
             type="button"
             onClick={onClose}
-            className="lg:hidden rounded-xl border border-slate-800 bg-slate-900 p-2 text-slate-300 hover:bg-slate-800"
+            className="rounded-xl border border-slate-800 bg-slate-900 p-2 text-slate-300 hover:bg-slate-800 lg:hidden"
             aria-label="Close navigation menu"
           >
             <X size={18} />
           </button>
         </div>
 
-        <nav className="space-y-2 flex-1 overflow-y-auto">
+        <nav className="flex-1 space-y-2 overflow-y-auto">
           {menuItems.map((item) => (
             <NavLink
               key={item.label}
@@ -97,7 +99,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
               end={item.path === "/admin" || item.path === "/customer/products"}
               onClick={onClose}
               className={({ isActive }) =>
-                `flex items-center gap-3 p-3 rounded-xl transition ${
+                `flex items-center gap-3 rounded-xl p-3 transition ${
                   isActive
                     ? "bg-slate-700 text-white"
                     : "text-slate-300 hover:bg-slate-800 hover:text-white"
@@ -110,11 +112,11 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           ))}
         </nav>
 
-        <div className="pt-4 border-t border-slate-800">
+        <div className="border-t border-slate-800 pt-4">
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 p-3 rounded-xl transition text-red-400 hover:bg-red-500/20"
+            className="flex w-full items-center gap-3 rounded-xl p-3 text-red-400 transition hover:bg-red-500/20"
           >
             <LogOut size={20} />
             <span>Logout</span>

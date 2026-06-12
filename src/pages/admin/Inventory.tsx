@@ -10,6 +10,11 @@ import {
   X,
 } from "lucide-react";
 
+import Button from "@/components/ui/Button";
+import Notice from "@/components/ui/Notice";
+import PageHeader from "@/components/ui/PageHeader";
+import PaginationControls from "@/components/ui/PaginationControls";
+import StatusBadge from "@/components/ui/StatusBadge";
 import type { InventoryItem, ProductFormPayload } from "@/types/Inventory";
 import {
   createProduct,
@@ -31,42 +36,18 @@ const emptyForm: ProductFormPayload = {
 
 type ModalMode = "create" | "edit" | null;
 
-function ProductImage({
-  imageUrl,
-  productName,
-  size,
-}: {
-  imageUrl?: string | null;
-  productName: string;
-  size: "mobile" | "desktop";
-}) {
-  if (imageUrl?.trim()) {
-    return (
-      <img
-        src={imageUrl}
-        alt={productName}
-        className={
-          size === "mobile"
-            ? "h-20 w-20 shrink-0 rounded-xl object-cover bg-slate-700"
-            : "h-14 w-14 shrink-0 rounded-xl object-cover bg-slate-700"
-        }
-      />
-    );
-  }
+function getStockTone(quantity: number) {
+  if (quantity <= 0) return "red";
+  if (quantity <= 5) return "red";
+  if (quantity <= 10) return "yellow";
+  return "green";
+}
 
-  return (
-    <div
-      className={
-        size === "mobile"
-          ? "h-20 w-20 shrink-0 rounded-xl bg-slate-700 flex items-center justify-center p-2 text-center text-[10px] font-semibold uppercase tracking-wide text-slate-400"
-          : "h-14 w-14 shrink-0 rounded-xl bg-slate-700 flex items-center justify-center p-1 text-center text-[9px] font-semibold uppercase tracking-wide text-slate-400"
-      }
-      aria-label={`No image available for ${productName}`}
-      title="No image available yet"
-    >
-      No Image
-    </div>
-  );
+function getStockLabel(quantity: number) {
+  if (quantity <= 0) return "Out of Stock";
+  if (quantity <= 5) return "Low Stock";
+  if (quantity <= 10) return "Almost Sold Out";
+  return "In Stock";
 }
 
 export default function Inventory() {
@@ -81,6 +62,9 @@ export default function Inventory() {
   const [categoryFilter, setCategoryFilter] = useState("ALL");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [stockFilter, setStockFilter] = useState("ALL");
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const [modalMode, setModalMode] = useState<ModalMode>(null);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
@@ -136,26 +120,26 @@ export default function Inventory() {
 
       const matchesStock =
         stockFilter === "ALL" ||
-        (stockFilter === "LOW" && item.quantityAvailable <= 10) ||
+        (stockFilter === "OUT" && item.quantityAvailable <= 0) ||
+        (stockFilter === "LOW" &&
+          item.quantityAvailable > 0 &&
+          item.quantityAvailable <= 5) ||
         (stockFilter === "WARNING" &&
-          item.quantityAvailable > 10 &&
-          item.quantityAvailable <= 20) ||
-        (stockFilter === "IN_STOCK" && item.quantityAvailable > 20);
+          item.quantityAvailable > 5 &&
+          item.quantityAvailable <= 10) ||
+        (stockFilter === "IN_STOCK" && item.quantityAvailable > 10);
 
       return matchesSearch && matchesCategory && matchesStatus && matchesStock;
     });
   }, [inventory, search, categoryFilter, statusFilter, stockFilter]);
 
-  function getStockStyle(quantity: number) {
-    if (quantity <= 10) return "bg-red-500/20 text-red-400";
-    if (quantity <= 20) return "bg-yellow-500/20 text-yellow-400";
-    return "bg-green-500/20 text-green-400";
-  }
+  const paginatedInventory = filteredInventory.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
 
-  function getStockLabel(quantity: number) {
-    if (quantity <= 10) return "Low Stock";
-    if (quantity <= 20) return "Warning";
-    return "In Stock";
+  function resetPaging() {
+    setCurrentPage(1);
   }
 
   function openCreateModal() {
@@ -279,13 +263,12 @@ export default function Inventory() {
   if (loading) {
     return (
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold mb-6">Inventory</h1>
-
-        <div className="space-y-4">
-          {[1, 2, 3].map((item) => (
+        <PageHeader title="Inventory" description="Loading catalog and stock data..." />
+        <div className="grid gap-4 lg:grid-cols-2">
+          {[1, 2, 3, 4].map((item) => (
             <div
               key={item}
-              className="h-24 bg-slate-800 rounded-xl animate-pulse"
+              className="h-32 animate-pulse rounded-2xl border border-slate-800 bg-slate-800"
             />
           ))}
         </div>
@@ -295,39 +278,29 @@ export default function Inventory() {
 
   return (
     <div>
-      <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold">Inventory</h1>
-          <p className="text-slate-400 mt-2">
-            Manage products, stock levels, catalog visibility, and product
-            status.
-          </p>
-        </div>
+      <PageHeader
+        title="Inventory"
+        description="Manage products, stock levels, catalog visibility, and product status using one responsive layout across mobile and desktop."
+        action={
+          <Button
+            onClick={openCreateModal}
+            variant="primary"
+            size="lg"
+            icon={<PackagePlus className="h-5 w-5" />}
+            className="w-full sm:w-auto"
+          >
+            Add Product
+          </Button>
+        }
+      />
 
-        <button
-          type="button"
-          onClick={openCreateModal}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-500 transition sm:w-auto"
-        >
-          <PackagePlus className="h-5 w-5" />
-          Add Product
-        </button>
+      <div className="mb-5 space-y-3">
+        {error && <Notice tone="error">{error}</Notice>}
+        {success && <Notice tone="success">{success}</Notice>}
       </div>
 
-      {error && (
-        <div className="mb-4 rounded-xl border border-red-500 bg-red-500/20 p-4 text-red-300">
-          {error}
-        </div>
-      )}
-
-      {success && (
-        <div className="mb-4 rounded-xl border border-green-500 bg-green-500/20 p-4 text-green-300">
-          {success}
-        </div>
-      )}
-
-      <div className="mb-6 rounded-2xl border border-slate-700 bg-slate-800 p-4">
-        <div className="mb-3 flex items-center gap-2 text-slate-300 font-semibold">
+      <div className="mb-6 rounded-2xl border border-slate-800 bg-slate-900/80 p-4 shadow-sm">
+        <div className="mb-3 flex items-center gap-2 font-semibold text-slate-200">
           <SlidersHorizontal className="h-5 w-5" />
           Filters
         </div>
@@ -337,16 +310,22 @@ export default function Inventory() {
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
             <input
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => {
+                setSearch(event.target.value);
+                resetPaging();
+              }}
               placeholder="Search product, description or category..."
-              className="w-full rounded-xl border border-slate-700 bg-slate-900 py-3 pl-10 pr-4 text-white outline-none focus:border-blue-500"
+              className="w-full rounded-xl border border-slate-700 bg-slate-950 py-3 pl-10 pr-4 text-white outline-none focus:border-blue-500"
             />
           </div>
 
           <select
             value={categoryFilter}
-            onChange={(event) => setCategoryFilter(event.target.value)}
-            className="rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
+            onChange={(event) => {
+              setCategoryFilter(event.target.value);
+              resetPaging();
+            }}
+            className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500"
           >
             <option value="ALL">All Categories</option>
             {categories.map((category) => (
@@ -358,8 +337,11 @@ export default function Inventory() {
 
           <select
             value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value)}
-            className="rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
+            onChange={(event) => {
+              setStatusFilter(event.target.value);
+              resetPaging();
+            }}
+            className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500"
           >
             <option value="ALL">All Statuses</option>
             <option value="ACTIVE">Active</option>
@@ -368,252 +350,132 @@ export default function Inventory() {
 
           <select
             value={stockFilter}
-            onChange={(event) => setStockFilter(event.target.value)}
-            className="rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
+            onChange={(event) => {
+              setStockFilter(event.target.value);
+              resetPaging();
+            }}
+            className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500"
           >
             <option value="ALL">All Stock Levels</option>
+            <option value="OUT">Out of Stock</option>
             <option value="LOW">Low Stock</option>
-            <option value="WARNING">Warning</option>
+            <option value="WARNING">Almost Sold Out</option>
             <option value="IN_STOCK">In Stock</option>
           </select>
         </div>
       </div>
 
-      <div className="space-y-4 md:hidden">
-        {filteredInventory.map((item) => (
-          <div
+      <div className="space-y-3">
+        {paginatedInventory.map((item) => (
+          <article
             key={item.inventoryId}
-            className="rounded-2xl border border-slate-700 bg-slate-800 p-4"
+            className="rounded-2xl border border-slate-800 bg-slate-900/85 p-4 shadow-sm transition hover:border-slate-700 hover:bg-slate-900"
           >
-            <div className="flex gap-4">
-              <ProductImage
-                imageUrl={item.product.imageUrl}
-                productName={item.product.name}
-                size="mobile"
-              />
+            <div className="grid gap-4 lg:grid-cols-[1.4fr_0.75fr_0.7fr_auto] lg:items-center">
+              <div className="min-w-0">
+                <div className="mb-2 flex flex-wrap items-center gap-2">
+                  <StatusBadge tone={item.product.active === false ? "red" : "green"}>
+                    {item.product.active === false ? "Inactive" : "Active"}
+                  </StatusBadge>
+                  <StatusBadge tone={getStockTone(item.quantityAvailable)}>
+                    {getStockLabel(item.quantityAvailable)}
+                  </StatusBadge>
+                  <span className="text-xs text-slate-500">
+                    Product #{item.product.id}
+                  </span>
+                </div>
 
-              <div className="min-w-0 flex-1">
-                <h3 className="font-semibold text-white break-words">
+                <h2 className="text-lg font-bold text-white">
                   {item.product.name}
-                </h3>
+                </h2>
 
-                <p className="text-sm text-slate-400">
+                <p className="mt-1 line-clamp-2 text-sm text-slate-400">
+                  {item.product.description || "No description captured yet."}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs uppercase tracking-wide text-slate-500">
+                  Category
+                </p>
+                <p className="font-semibold text-slate-200">
                   {item.product.category || "General"}
                 </p>
+              </div>
 
-                {item.product.description && (
-                  <p className="mt-1 line-clamp-2 text-xs text-slate-500">
-                    {item.product.description}
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">
+                    Price
                   </p>
-                )}
+                  <p className="font-bold text-blue-300">
+                    R {item.product.price.toFixed(2)}
+                  </p>
+                </div>
 
-                <p className="mt-2 text-xl font-bold text-blue-400">
-                  R {item.product.price.toFixed(2)}
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              <div>
-                <p className="text-xs text-slate-500">Quantity</p>
-                <p className="font-semibold text-white">
-                  {item.quantityAvailable}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs text-slate-500">Product ID</p>
-                <p className="text-white">{item.product.id}</p>
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">
+                    Qty
+                  </p>
+                  <p className="font-bold text-white">
+                    {item.quantityAvailable}
+                  </p>
+                </div>
               </div>
 
-              <div>
-                <p className="text-xs text-slate-500">Product Status</p>
-                <span
-                  className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                    item.product.active === false
-                      ? "bg-red-500/20 text-red-400"
-                      : "bg-green-500/20 text-green-400"
-                  }`}
+              <div className="flex flex-col gap-2 sm:flex-row lg:justify-end">
+                <Button
+                  variant="secondary"
+                  onClick={() => openEditModal(item)}
+                  icon={<Edit className="h-4 w-4" />}
                 >
-                  {item.product.active === false ? "Inactive" : "Active"}
-                </span>
-              </div>
+                  Edit
+                </Button>
 
-              <div>
-                <p className="text-xs text-slate-500">Stock Status</p>
-                <span
-                  className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getStockStyle(
-                    item.quantityAvailable
-                  )}`}
+                <Button
+                  variant="ghost"
+                  onClick={() => handleQuickStockUpdate(item)}
                 >
-                  {getStockLabel(item.quantityAvailable)}
-                </span>
+                  Stock
+                </Button>
+
+                <Button
+                  variant="dangerGhost"
+                  onClick={() => handleObsolete(item)}
+                  disabled={item.product.active === false}
+                  icon={<Archive className="h-4 w-4" />}
+                >
+                  Obsolete
+                </Button>
               </div>
             </div>
-
-            <div className="mt-4 grid grid-cols-1 gap-2">
-              <button
-                type="button"
-                onClick={() => openEditModal(item)}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-700 px-4 py-3 font-semibold text-white hover:bg-slate-600"
-              >
-                <Edit className="h-4 w-4" />
-                Edit Product
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickStockUpdate(item)}
-                className="rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-500"
-              >
-                Update Stock
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleObsolete(item)}
-                disabled={item.product.active === false}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-3 font-semibold text-white hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <Archive className="h-4 w-4" />
-                Mark Obsolete
-              </button>
-            </div>
-          </div>
+          </article>
         ))}
 
-        {filteredInventory.length === 0 && (
-          <div className="rounded-2xl bg-slate-800 p-6 text-center text-slate-400">
+        {paginatedInventory.length === 0 && (
+          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-400">
             No inventory found.
           </div>
         )}
       </div>
 
-      <div className="hidden overflow-hidden rounded-2xl bg-slate-800 md:block">
-        <table className="w-full">
-          <thead className="bg-slate-900">
-            <tr>
-              <th className="text-left p-4">Product</th>
-              <th className="text-left p-4">Category</th>
-              <th className="text-left p-4">Price</th>
-              <th className="text-left p-4">Product Status</th>
-              <th className="text-left p-4">Quantity</th>
-              <th className="text-left p-4">Stock Status</th>
-              <th className="text-right p-4">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredInventory.map((item) => (
-              <tr
-                key={item.inventoryId}
-                className="border-t border-slate-700 hover:bg-slate-700 transition"
-              >
-                <td className="p-4">
-                  <div className="flex items-center gap-4">
-                    <ProductImage
-                      imageUrl={item.product.imageUrl}
-                      productName={item.product.name}
-                      size="desktop"
-                    />
-
-                    <div>
-                      <p className="font-semibold text-white">
-                        {item.product.name}
-                      </p>
-                      <p className="text-xs text-slate-400">
-                        Product ID: {item.product.id}
-                      </p>
-                      {item.product.description && (
-                        <p className="mt-1 max-w-xs truncate text-xs text-slate-500">
-                          {item.product.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </td>
-
-                <td className="p-4 text-slate-300">
-                  {item.product.category || "General"}
-                </td>
-
-                <td className="p-4 font-semibold">
-                  R {item.product.price.toFixed(2)}
-                </td>
-
-                <td className="p-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                      item.product.active === false
-                        ? "bg-red-500/20 text-red-400"
-                        : "bg-green-500/20 text-green-400"
-                    }`}
-                  >
-                    {item.product.active === false ? "Inactive" : "Active"}
-                  </span>
-                </td>
-
-                <td className="p-4">{item.quantityAvailable}</td>
-
-                <td className="p-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-sm font-semibold ${getStockStyle(
-                      item.quantityAvailable
-                    )}`}
-                  >
-                    {getStockLabel(item.quantityAvailable)}
-                  </span>
-                </td>
-
-                <td className="p-4">
-                  <div className="flex justify-end gap-2">
-                    <button
-                      type="button"
-                      onClick={() => openEditModal(item)}
-                      className="inline-flex items-center gap-1 rounded-lg bg-slate-700 px-3 py-2 text-sm text-slate-200 hover:bg-slate-600"
-                    >
-                      <Edit className="h-4 w-4" />
-                      Edit
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleQuickStockUpdate(item)}
-                      className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-500"
-                    >
-                      Stock
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleObsolete(item)}
-                      disabled={item.product.active === false}
-                      className="inline-flex items-center gap-1 rounded-lg bg-red-600 px-3 py-2 text-sm text-white hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      <Archive className="h-4 w-4" />
-                      Obsolete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-
-            {filteredInventory.length === 0 && (
-              <tr>
-                <td colSpan={7} className="p-6 text-center text-slate-400">
-                  No inventory found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <PaginationControls
+        page={currentPage}
+        pageSize={pageSize}
+        totalItems={filteredInventory.length}
+        itemLabel="inventory items"
+        onPageChange={setCurrentPage}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setCurrentPage(1);
+        }}
+      />
 
       {modalMode && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 md:items-center">
-          <div className="w-full max-w-3xl rounded-2xl border border-slate-700 bg-slate-900 p-5 shadow-2xl md:p-6">
+          <div className="w-full max-w-3xl rounded-2xl border border-slate-700 bg-slate-950 p-5 shadow-2xl md:p-6">
             <div className="mb-6 flex items-center justify-between gap-4">
-              <h2 className="text-xl md:text-2xl font-bold">
+              <h2 className="text-xl font-bold text-white md:text-2xl">
                 {modalMode === "create" ? "Add Product" : "Edit Product"}
               </h2>
 
@@ -621,45 +483,52 @@ export default function Inventory() {
                 type="button"
                 onClick={closeModal}
                 className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white"
+                aria-label="Close modal"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
+            {form.imageUrl?.trim() && (
+              <div className="mb-5 overflow-hidden rounded-2xl border border-slate-800 bg-slate-900">
+                <img
+                  src={form.imageUrl}
+                  alt={form.name || "Product preview"}
+                  className="h-48 w-full object-cover"
+                />
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-sm text-slate-400">
-                    Name
-                  </label>
+                <label>
+                  <span className="mb-2 block text-sm text-slate-400">Name</span>
                   <input
                     required
                     value={form.name}
                     onChange={(event) =>
                       setForm({ ...form, name: event.target.value })
                     }
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none focus:border-blue-500"
+                    className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
                   />
-                </div>
+                </label>
 
-                <div>
-                  <label className="mb-2 block text-sm text-slate-400">
+                <label>
+                  <span className="mb-2 block text-sm text-slate-400">
                     Category
-                  </label>
+                  </span>
                   <input
                     required
                     value={form.category}
                     onChange={(event) =>
                       setForm({ ...form, category: event.target.value })
                     }
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none focus:border-blue-500"
+                    className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
                   />
-                </div>
+                </label>
 
-                <div>
-                  <label className="mb-2 block text-sm text-slate-400">
-                    Price
-                  </label>
+                <label>
+                  <span className="mb-2 block text-sm text-slate-400">Price</span>
                   <input
                     required
                     min="0"
@@ -669,14 +538,14 @@ export default function Inventory() {
                     onChange={(event) =>
                       setForm({ ...form, price: Number(event.target.value) })
                     }
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none focus:border-blue-500"
+                    className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
                   />
-                </div>
+                </label>
 
-                <div>
-                  <label className="mb-2 block text-sm text-slate-400">
+                <label>
+                  <span className="mb-2 block text-sm text-slate-400">
                     Stock Quantity
-                  </label>
+                  </span>
                   <input
                     required
                     min="0"
@@ -688,37 +557,37 @@ export default function Inventory() {
                         initialStock: Number(event.target.value),
                       })
                     }
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none focus:border-blue-500"
+                    className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
                   />
-                </div>
+                </label>
 
-                <div className="md:col-span-2">
-                  <label className="mb-2 block text-sm text-slate-400">
+                <label className="md:col-span-2">
+                  <span className="mb-2 block text-sm text-slate-400">
                     Image URL
-                  </label>
+                  </span>
                   <input
                     value={form.imageUrl}
                     onChange={(event) =>
                       setForm({ ...form, imageUrl: event.target.value })
                     }
-                    placeholder="Optional. Leave blank to show No Image."
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none focus:border-blue-500"
+                    placeholder="Optional. Preview appears here when populated."
+                    className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
                   />
-                </div>
+                </label>
 
-                <div className="md:col-span-2">
-                  <label className="mb-2 block text-sm text-slate-400">
+                <label className="md:col-span-2">
+                  <span className="mb-2 block text-sm text-slate-400">
                     Description
-                  </label>
+                  </span>
                   <textarea
                     value={form.description}
                     onChange={(event) =>
                       setForm({ ...form, description: event.target.value })
                     }
                     rows={4}
-                    className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white outline-none focus:border-blue-500"
+                    className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
                   />
-                </div>
+                </label>
 
                 <label className="flex items-center gap-3 text-sm text-slate-300">
                   <input
@@ -727,29 +596,25 @@ export default function Inventory() {
                     onChange={(event) =>
                       setForm({ ...form, active: event.target.checked })
                     }
-                    className="h-4 w-4"
+                    className="h-4 w-4 rounded border-slate-600 bg-slate-900 text-blue-600"
                   />
-                  Product is active and visible to customers
+                  Active product
                 </label>
               </div>
 
               <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-end">
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="rounded-xl bg-slate-700 px-4 py-3 font-semibold text-slate-200 hover:bg-slate-600"
-                >
+                <Button variant="ghost" onClick={closeModal}>
                   Cancel
-                </button>
+                </Button>
 
-                <button
+                <Button
                   type="submit"
+                  variant="primary"
                   disabled={saving}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-500 disabled:opacity-60"
+                  icon={<Save className="h-4 w-4" />}
                 >
-                  <Save className="h-5 w-5" />
-                  {saving ? "Saving..." : "Save"}
-                </button>
+                  {saving ? "Saving..." : "Save Product"}
+                </Button>
               </div>
             </form>
           </div>

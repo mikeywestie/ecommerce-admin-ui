@@ -1,5 +1,11 @@
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { ChevronDown, ChevronUp, Search } from "lucide-react";
 
+import Button from "@/components/ui/Button";
+import Notice from "@/components/ui/Notice";
+import PageHeader from "@/components/ui/PageHeader";
+import PaginationControls from "@/components/ui/PaginationControls";
+import StatusBadge from "@/components/ui/StatusBadge";
 import type { Order } from "../../types/Order";
 import { getOrders } from "../../services/orderService";
 
@@ -13,17 +19,22 @@ type SortField =
 
 type SortDirection = "asc" | "desc";
 
+function getStatusTone(status: Order["status"]) {
+  if (status === "PAID") return "green";
+  if (status === "PENDING" || status === "CREATED") return "yellow";
+  return "red";
+}
+
 export default function Orders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState<SortField>("createdAt");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
-
-  const pageSize = 5;
 
   useEffect(() => {
     loadOrders();
@@ -43,20 +54,9 @@ export default function Orders() {
     }
   }
 
-  function getStatusStyle(status: Order["status"]) {
-    if (status === "PAID") {
-      return "bg-green-500/20 text-green-400";
-    }
-
-    if (status === "PENDING" || status === "CREATED") {
-      return "bg-yellow-500/20 text-yellow-400";
-    }
-
-    return "bg-red-500/20 text-red-400";
-  }
-
   function handleSort(field: SortField) {
     setCurrentPage(1);
+    setExpandedOrderId(null);
 
     if (sortField === field) {
       setSortDirection((direction) => (direction === "asc" ? "desc" : "asc"));
@@ -67,88 +67,56 @@ export default function Orders() {
     setSortDirection("asc");
   }
 
-  function getSortIcon(field: SortField) {
-    if (sortField !== field) {
-      return "↕";
-    }
+  const sortedOrders = useMemo(() => {
+    const filteredOrders = orders.filter((order) => {
+      const search = searchTerm.toLowerCase();
 
-    return sortDirection === "asc" ? "↑" : "↓";
-  }
+      return (
+        order.customerName.toLowerCase().includes(search) ||
+        order.customerEmail.toLowerCase().includes(search) ||
+        order.status.toLowerCase().includes(search) ||
+        order.id.toString().includes(search)
+      );
+    });
 
-  function toggleOrderItems(orderId: number) {
-    setExpandedOrderId((currentId) => (currentId === orderId ? null : orderId));
-  }
+    return [...filteredOrders].sort((a, b) => {
+      let firstValue: string | number = "";
+      let secondValue: string | number = "";
 
-  const filteredOrders = orders.filter((order) => {
-    const search = searchTerm.toLowerCase();
+      if (sortField === "createdAt") {
+        firstValue = new Date(a.createdAt).getTime();
+        secondValue = new Date(b.createdAt).getTime();
+      } else {
+        firstValue = a[sortField];
+        secondValue = b[sortField];
+      }
 
-    return (
-      order.customerName.toLowerCase().includes(search) ||
-      order.customerEmail.toLowerCase().includes(search) ||
-      order.status.toLowerCase().includes(search) ||
-      order.id.toString().includes(search)
-    );
-  });
+      if (typeof firstValue === "number" && typeof secondValue === "number") {
+        return sortDirection === "asc"
+          ? firstValue - secondValue
+          : secondValue - firstValue;
+      }
 
-  const sortedOrders = [...filteredOrders].sort((a, b) => {
-    let firstValue: string | number = "";
-    let secondValue: string | number = "";
-
-    if (sortField === "createdAt") {
-      firstValue = new Date(a.createdAt).getTime();
-      secondValue = new Date(b.createdAt).getTime();
-    } else {
-      firstValue = a[sortField];
-      secondValue = b[sortField];
-    }
-
-    if (typeof firstValue === "number" && typeof secondValue === "number") {
       return sortDirection === "asc"
-        ? firstValue - secondValue
-        : secondValue - firstValue;
-    }
-
-    return sortDirection === "asc"
-      ? String(firstValue).localeCompare(String(secondValue))
-      : String(secondValue).localeCompare(String(firstValue));
-  });
-
-  const totalPages = Math.ceil(sortedOrders.length / pageSize);
+        ? String(firstValue).localeCompare(String(secondValue))
+        : String(secondValue).localeCompare(String(firstValue));
+    });
+  }, [orders, searchTerm, sortDirection, sortField]);
 
   const paginatedOrders = sortedOrders.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
-  if (error) {
-    return (
-      <div className="p-6">
-        <h1 className="text-3xl font-bold mb-6">Orders</h1>
-
-        <div className="bg-red-500/20 border border-red-500 text-red-400 p-4 rounded-xl">
-          {error}
-        </div>
-
-        <button
-          onClick={loadOrders}
-          className="mt-4 bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl"
-        >
-          Retry
-        </button>
-      </div>
-    );
-  }
-
   if (loading) {
     return (
-      <div className="p-6">
-        <h1 className="text-3xl font-bold mb-6">Orders</h1>
-
-        <div className="space-y-4">
-          {[1, 2, 3].map((item) => (
+      <div>
+        <PageHeader title="Orders" description="Loading seeded order history..." />
+        <div className="space-y-3">
+          {[1, 2, 3, 4].map((item) => (
             <div
               key={item}
-              className="h-16 bg-slate-800 rounded-xl animate-pulse"
+              className="h-28 animate-pulse rounded-2xl border border-slate-800 bg-slate-800"
             />
           ))}
         </div>
@@ -157,205 +125,190 @@ export default function Orders() {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <h1 className="text-3xl font-bold">Orders</h1>
+    <div>
+      <PageHeader
+        title="Orders"
+        description="Review customer orders in a responsive card layout with no horizontal scrolling."
+      />
 
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(event) => {
-            setSearchTerm(event.target.value);
-            setCurrentPage(1);
-            setExpandedOrderId(null);
-          }}
-          placeholder="Search by customer, email, status or ID..."
-          className="w-full md:w-96 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500"
-        />
-      </div>
-
-      <div className="bg-slate-800 rounded-2xl overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-slate-900">
-            <tr>
-              <th
-                onClick={() => handleSort("id")}
-                className="text-left p-4 cursor-pointer select-none"
-              >
-                Order ID {getSortIcon("id")}
-              </th>
-              <th
-                onClick={() => handleSort("customerName")}
-                className="text-left p-4 cursor-pointer select-none"
-              >
-                Customer {getSortIcon("customerName")}
-              </th>
-              <th
-                onClick={() => handleSort("customerEmail")}
-                className="text-left p-4 cursor-pointer select-none"
-              >
-                Email {getSortIcon("customerEmail")}
-              </th>
-              <th
-                onClick={() => handleSort("totalAmount")}
-                className="text-left p-4 cursor-pointer select-none"
-              >
-                Amount {getSortIcon("totalAmount")}
-              </th>
-              <th
-                onClick={() => handleSort("status")}
-                className="text-left p-4 cursor-pointer select-none"
-              >
-                Status {getSortIcon("status")}
-              </th>
-              <th
-                onClick={() => handleSort("createdAt")}
-                className="text-left p-4 cursor-pointer select-none"
-              >
-                Created {getSortIcon("createdAt")}
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {paginatedOrders.map((order) => (
-              <Fragment key={order.id}>
-                <tr className="border-t border-slate-700 hover:bg-slate-700 transition">
-                  <td className="p-4">
-                    <button
-                      onClick={() => toggleOrderItems(order.id)}
-                      className="mr-3 inline-flex h-7 w-7 items-center justify-center rounded-lg bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white"
-                    >
-                      {expandedOrderId === order.id ? "−" : "+"}
-                    </button>
-
-                    {order.id}
-                  </td>
-
-                  <td className="p-4">{order.customerName}</td>
-                  <td className="p-4 text-slate-400">{order.customerEmail}</td>
-                  <td className="p-4">R {order.totalAmount.toFixed(2)}</td>
-
-                  <td className="p-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusStyle(
-                        order.status
-                      )}`}
-                    >
-                      {order.status}
-                    </span>
-                  </td>
-
-                  <td className="p-4 text-slate-400">
-                    {new Date(order.createdAt).toLocaleDateString()}
-                  </td>
-                </tr>
-
-                {expandedOrderId === order.id && (
-                  <tr className="bg-slate-900/60">
-                    <td colSpan={6} className="p-4">
-                      <div className="mb-3 flex items-center justify-between">
-                        <h3 className="font-semibold text-white">
-                          Order Items
-                        </h3>
-
-                        <span className="text-sm text-slate-400">
-                          {order.items.length} item
-                          {order.items.length === 1 ? "" : "s"}
-                        </span>
-                      </div>
-
-                      <div className="rounded-xl border border-slate-700 overflow-hidden">
-                        <table className="w-full text-sm">
-                          <thead className="bg-slate-950">
-                            <tr>
-                              <th className="text-left p-3">Product</th>
-                              <th className="text-left p-3">Quantity</th>
-                              <th className="text-left p-3">Unit Price</th>
-                              <th className="text-left p-3">Line Total</th>
-                            </tr>
-                          </thead>
-
-                          <tbody>
-                            {order.items.map((item) => (
-                              <tr
-                                key={`${order.id}-${item.productId}`}
-                                className="border-t border-slate-700"
-                              >
-                                <td className="p-3">{item.productName}</td>
-                                <td className="p-3">{item.quantity}</td>
-                                <td className="p-3">
-                                  R {item.unitPrice.toFixed(2)}
-                                </td>
-                                <td className="p-3">
-                                  R {item.lineTotal.toFixed(2)}
-                                </td>
-                              </tr>
-                            ))}
-
-                            {order.items.length === 0 && (
-                              <tr>
-                                <td
-                                  colSpan={4}
-                                  className="p-4 text-center text-slate-400"
-                                >
-                                  No items found for this order.
-                                </td>
-                              </tr>
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </Fragment>
-            ))}
-
-            {paginatedOrders.length === 0 && (
-              <tr>
-                <td colSpan={6} className="p-6 text-center text-slate-400">
-                  No orders found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="flex items-center justify-between mt-4 text-sm text-slate-400">
-        <p>
-          Showing {paginatedOrders.length} of {sortedOrders.length} orders
-        </p>
-
-        <div className="flex items-center gap-3">
-          <span>
-            Page {currentPage} of {totalPages || 1}
-          </span>
-
-          <button
-            disabled={currentPage === 1}
-            onClick={() => {
-              setCurrentPage((page) => page - 1);
-              setExpandedOrderId(null);
-            }}
-            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:hover:bg-slate-800"
-          >
-            Previous
-          </button>
-
-          <button
-            disabled={currentPage === totalPages || totalPages === 0}
-            onClick={() => {
-              setCurrentPage((page) => page + 1);
-              setExpandedOrderId(null);
-            }}
-            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:hover:bg-slate-800"
-          >
-            Next
-          </button>
+      {error && (
+        <div className="mb-5 space-y-3">
+          <Notice tone="error">{error}</Notice>
+          <Button onClick={loadOrders}>Retry</Button>
         </div>
+      )}
+
+      <div className="mb-5 grid gap-3 rounded-2xl border border-slate-800 bg-slate-900/80 p-4 lg:grid-cols-[1fr_auto_auto]">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(event) => {
+              setSearchTerm(event.target.value);
+              setCurrentPage(1);
+              setExpandedOrderId(null);
+            }}
+            placeholder="Search by customer, email, status or ID..."
+            className="w-full rounded-xl border border-slate-700 bg-slate-950 py-3 pl-10 pr-4 text-white outline-none focus:border-blue-500"
+          />
+        </div>
+
+        <select
+          value={sortField}
+          onChange={(event) => handleSort(event.target.value as SortField)}
+          className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500"
+        >
+          <option value="createdAt">Sort by Date</option>
+          <option value="id">Sort by ID</option>
+          <option value="customerName">Sort by Customer</option>
+          <option value="customerEmail">Sort by Email</option>
+          <option value="totalAmount">Sort by Amount</option>
+          <option value="status">Sort by Status</option>
+        </select>
+
+        <Button
+          variant="secondary"
+          onClick={() =>
+            setSortDirection((direction) => (direction === "asc" ? "desc" : "asc"))
+          }
+        >
+          {sortDirection === "asc" ? "Ascending" : "Descending"}
+        </Button>
       </div>
+
+      <div className="space-y-3">
+        {paginatedOrders.map((order) => {
+          const expanded = expandedOrderId === order.id;
+
+          return (
+            <article
+              key={order.id}
+              className="rounded-2xl border border-slate-800 bg-slate-900/85 p-4 shadow-sm transition hover:border-slate-700"
+            >
+              <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr_0.9fr_0.7fr_auto] lg:items-center">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">
+                    Order
+                  </p>
+                  <p className="text-xl font-bold text-white">#{order.id}</p>
+                </div>
+
+                <div className="min-w-0">
+                  <p className="font-semibold text-white">{order.customerName}</p>
+                  <p className="truncate text-sm text-slate-400">
+                    {order.customerEmail}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">
+                    Created
+                  </p>
+                  <p className="font-semibold text-slate-200">
+                    {new Date(order.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">
+                    Total
+                  </p>
+                  <p className="font-bold text-blue-300">
+                    R {order.totalAmount.toFixed(2)}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+                  <StatusBadge tone={getStatusTone(order.status)}>
+                    {order.status}
+                  </StatusBadge>
+
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() =>
+                      setExpandedOrderId((currentId) =>
+                        currentId === order.id ? null : order.id
+                      )
+                    }
+                    icon={
+                      expanded ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )
+                    }
+                  >
+                    {expanded ? "Hide" : "Open"}
+                  </Button>
+                </div>
+              </div>
+
+              {expanded && (
+                <div className="mt-4 rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                    <h3 className="font-semibold text-white">Order Items</h3>
+                    <span className="text-sm text-slate-400">
+                      {order.items.length} item{order.items.length === 1 ? "" : "s"}
+                    </span>
+                  </div>
+
+                  <div className="space-y-2">
+                    {order.items.map((item) => (
+                      <div
+                        key={`${order.id}-${item.productId}`}
+                        className="grid gap-2 rounded-xl border border-slate-800 bg-slate-900 p-3 sm:grid-cols-[1fr_auto_auto_auto] sm:items-center"
+                      >
+                        <p className="font-semibold text-white">
+                          {item.productName}
+                        </p>
+                        <p className="text-sm text-slate-400">
+                          Qty {item.quantity}
+                        </p>
+                        <p className="text-sm text-slate-400">
+                          R {item.unitPrice.toFixed(2)}
+                        </p>
+                        <p className="font-bold text-blue-300">
+                          R {item.lineTotal.toFixed(2)}
+                        </p>
+                      </div>
+                    ))}
+
+                    {order.items.length === 0 && (
+                      <p className="rounded-xl border border-slate-800 p-4 text-center text-slate-400">
+                        No items found for this order.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </article>
+          );
+        })}
+
+        {paginatedOrders.length === 0 && (
+          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-8 text-center text-slate-400">
+            No orders found.
+          </div>
+        )}
+      </div>
+
+      <PaginationControls
+        page={currentPage}
+        pageSize={pageSize}
+        totalItems={sortedOrders.length}
+        itemLabel="orders"
+        onPageChange={(page) => {
+          setCurrentPage(page);
+          setExpandedOrderId(null);
+        }}
+        onPageSizeChange={(size) => {
+          setPageSize(size);
+          setCurrentPage(1);
+          setExpandedOrderId(null);
+        }}
+      />
     </div>
   );
 }

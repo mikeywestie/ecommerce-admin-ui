@@ -14,6 +14,7 @@ import ProductDetails from "./pages/customer/ProductDetails";
 import Cart from "./pages/customer/Cart";
 import Checkout from "./pages/customer/Checkout";
 import OrderSuccess from "./pages/customer/OrderSuccess";
+import CustomerOrders from "./pages/customer/CustomerOrders";
 
 import Login from "./pages/auth/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -55,6 +56,7 @@ function App() {
           <Route path="products/:id" element={<ProductDetails />} />
           <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
+          <Route path="orders" element={<CustomerOrders />} />
           <Route path="order-success" element={<OrderSuccess />} />
         </Route>
 
