@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 
+import BuildInfoBadge from "./BuildInfoBadge";
 import { logout } from "../services/authService";
 
 const adminMenuItems = [
@@ -112,7 +113,9 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           ))}
         </nav>
 
-        <div className="border-t border-slate-800 pt-4">
+        <div className="space-y-3 border-t border-slate-800 pt-4">
+          <BuildInfoBadge />
+
           <button
             type="button"
             onClick={handleLogout}
