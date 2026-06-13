@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 
-import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
+import ReportBugButton from "../components/ReportBugButton";
+import Sidebar from "../components/Sidebar";
 
 export default function MainLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -18,6 +19,8 @@ export default function MainLayout() {
           <Outlet />
         </main>
       </div>
+
+      <ReportBugButton />
     </div>
   );
 }
