@@ -1,13 +1,16 @@
 import type { FormEvent } from "react";
 import { useState } from "react";
 import {
+  BookOpenText,
   Eye,
   EyeOff,
+  FileText,
   Lock,
   Mail,
   ShieldCheck,
   ShoppingBag,
   UserRound,
+  X,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -21,6 +24,7 @@ const CUSTOMER_EMAIL = "customer@ecommerce.local";
 const CUSTOMER_PASSWORD = "Customer@12345";
 
 type DemoMode = "admin" | "customer";
+type InfoTab = "readme" | "releaseNotes";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -30,6 +34,8 @@ export default function Login() {
   const [password, setPassword] = useState(ADMIN_PASSWORD);
   const [showPassword, setShowPassword] = useState(false);
   const [selectedDemo, setSelectedDemo] = useState<DemoMode>("admin");
+  const [activeInfoTab, setActiveInfoTab] = useState<InfoTab>("readme");
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -80,14 +86,30 @@ export default function Login() {
     setError("");
   }
 
+  function openInfo(tab: InfoTab = "readme") {
+    setActiveInfoTab(tab);
+    setIsInfoOpen(true);
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
         <section className="hidden lg:flex flex-col justify-between border-r border-slate-800 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950 p-10">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-2 text-sm text-blue-300">
-              <ShieldCheck className="h-4 w-4" />
-              Live Portfolio Demo
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-2 text-sm text-blue-300">
+                <ShieldCheck className="h-4 w-4" />
+                Live Portfolio Demo
+              </div>
+
+              <button
+                type="button"
+                onClick={() => openInfo("readme")}
+                className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/70 px-4 py-2 text-sm text-slate-200 transition hover:border-blue-500/60 hover:bg-blue-500/10 hover:text-blue-200"
+              >
+                <BookOpenText className="h-4 w-4" />
+                README / Release Notes
+              </button>
             </div>
 
             <h1 className="mt-10 text-5xl font-bold leading-tight">
@@ -145,6 +167,22 @@ export default function Login() {
                 </p>
               </div>
 
+              <button
+                type="button"
+                onClick={() => openInfo("readme")}
+                className="mb-6 flex w-full items-center gap-3 rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 text-left transition hover:border-blue-400/70 hover:bg-blue-500/20"
+              >
+                <FileText className="h-5 w-5 text-blue-300" />
+                <span>
+                  <span className="block font-semibold text-slate-100">
+                    View README / Release Notes
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    Project overview, demo notes, known issues, and roadmap.
+                  </span>
+                </span>
+              </button>
+
               <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <button
                   type="button"
@@ -198,8 +236,7 @@ export default function Login() {
                     Email: <span className="text-slate-200">{email}</span>
                   </p>
                   <p>
-                    Password:{" "}
-                    <span className="text-slate-200">{password}</span>
+                    Password: <span className="text-slate-200">{password}</span>
                   </p>
                 </div>
               </div>
@@ -253,9 +290,7 @@ export default function Login() {
                       type="button"
                       onClick={() => setShowPassword((value) => !value)}
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? (
                         <EyeOff className="h-5 w-5" />
@@ -286,6 +321,147 @@ export default function Login() {
           </div>
         </main>
       </div>
+
+      {isInfoOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-sm">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl">
+            <div className="flex items-start justify-between gap-4 border-b border-slate-800 p-5 sm:p-6">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-300">
+                  Portfolio Demo Notes
+                </p>
+                <h2 className="mt-2 text-2xl font-bold">
+                  E-commerce Platform Documentation
+                </h2>
+                <p className="mt-2 text-sm text-slate-400">
+                  A quick guide for recruiters, clients, and anyone testing the live demo.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsInfoOpen(false)}
+                className="rounded-full border border-slate-700 bg-slate-800 p-2 text-slate-400 transition hover:border-slate-500 hover:text-white"
+                aria-label="Close documentation modal"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="border-b border-slate-800 px-5 pt-4 sm:px-6">
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveInfoTab("readme")}
+                  className={`rounded-t-xl px-4 py-3 text-sm font-semibold transition ${
+                    activeInfoTab === "readme"
+                      ? "bg-blue-600 text-white"
+                      : "bg-slate-800 text-slate-400 hover:text-white"
+                  }`}
+                >
+                  README
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveInfoTab("releaseNotes")}
+                  className={`rounded-t-xl px-4 py-3 text-sm font-semibold transition ${
+                    activeInfoTab === "releaseNotes"
+                      ? "bg-blue-600 text-white"
+                      : "bg-slate-800 text-slate-400 hover:text-white"
+                  }`}
+                >
+                  Release Notes
+                </button>
+              </div>
+            </div>
+
+            <div className="max-h-[60vh] overflow-y-auto p-5 sm:p-6">
+              {activeInfoTab === "readme" ? (
+                <div className="space-y-6 text-sm leading-6 text-slate-300">
+                  <section>
+                    <h3 className="text-lg font-bold text-white">Project overview</h3>
+                    <p className="mt-2">
+                      This is a full-stack e-commerce portfolio demo built with a Spring Boot API, a React frontend, PostgreSQL persistence, role-based authentication, admin operations, and a customer storefront flow.
+                    </p>
+                  </section>
+
+                  <section>
+                    <h3 className="text-lg font-bold text-white">Tech stack</h3>
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                      <InfoPill label="Backend" value="Java + Spring Boot" />
+                      <InfoPill label="Frontend" value="React + Vite + Tailwind" />
+                      <InfoPill label="Database" value="PostgreSQL / Supabase" />
+                      <InfoPill label="Deployment" value="Render + GitHub Pages" />
+                    </div>
+                  </section>
+
+                  <section>
+                    <h3 className="text-lg font-bold text-white">Main features</h3>
+                    <ul className="mt-3 list-disc space-y-2 pl-5">
+                      <li>Admin dashboard for orders, payments, inventory, coupons, and system health.</li>
+                      <li>Customer storefront with products, cart, checkout, and order success flow.</li>
+                      <li>JWT-based authentication with admin and customer demo roles.</li>
+                      <li>Live health badge connected to the deployed Spring Boot health endpoint.</li>
+                      <li>Stock validation, coupon support, and payment simulation for demo purposes.</li>
+                    </ul>
+                  </section>
+                </div>
+              ) : (
+                <div className="space-y-6 text-sm leading-6 text-slate-300">
+                  <section>
+                    <span className="rounded-full border border-blue-500/40 bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-300">
+                      Version 1.0.0
+                    </span>
+
+                    <h3 className="mt-4 text-lg font-bold text-white">Latest changes</h3>
+                    <ul className="mt-3 list-disc space-y-2 pl-5">
+                      <li>Added customer and admin demo account selector.</li>
+                      <li>Added live API health badge on the login screen.</li>
+                      <li>Added customer storefront flow with products, cart, checkout, and orders.</li>
+                      <li>Added admin modules for dashboard, inventory, payments, orders, coupons, and system health.</li>
+                      <li>Added this README / Release Notes modal for clearer demo presentation.</li>
+                    </ul>
+                  </section>
+
+                  <section>
+                    <h3 className="text-lg font-bold text-white">Known notes</h3>
+                    <ul className="mt-3 list-disc space-y-2 pl-5">
+                      <li>The backend is hosted on Render, so the first request may be slower after inactivity.</li>
+                      <li>Kafka is not required for the live demo environment and may be disabled in cloud deployment.</li>
+                      <li>Demo data is intended for portfolio testing, not real customer purchases.</li>
+                    </ul>
+                  </section>
+
+                  <section>
+                    <h3 className="text-lg font-bold text-white">Next improvements</h3>
+                    <ul className="mt-3 list-disc space-y-2 pl-5">
+                      <li>Improve product images and storefront polish.</li>
+                      <li>Add richer sales analytics to the admin dashboard.</li>
+                      <li>Add more realistic order and payment demo scenarios.</li>
+                      <li>Continue improving mobile responsiveness across admin tables and customer pages.</li>
+                    </ul>
+                  </section>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+type InfoPillProps = {
+  label: string;
+  value: string;
+};
+
+function InfoPill({ label, value }: InfoPillProps) {
+  return (
+    <div className="rounded-xl border border-slate-700 bg-slate-950/50 p-4">
+      <p className="text-xs uppercase tracking-wide text-slate-500">{label}</p>
+      <p className="mt-1 font-semibold text-slate-100">{value}</p>
     </div>
   );
 }
