@@ -41,9 +41,18 @@ export default function HealthBadge() {
   }
 
   useEffect(() => {
-    checkHealth();
-    const interval = window.setInterval(checkHealth, 30000);
-    return () => window.clearInterval(interval);
+    const timeoutId = window.setTimeout(() => {
+      void checkHealth();
+    }, 0);
+
+    const intervalId = window.setInterval(() => {
+      void checkHealth();
+    }, 30000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.clearInterval(intervalId);
+    };
   }, []);
 
   const styles = {

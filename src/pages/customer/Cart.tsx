@@ -48,14 +48,12 @@ export default function Cart() {
     loadCart();
   }, []);
 
-  const items = cart?.items ?? [];
+  const items = useMemo(() => cart?.items ?? [], [cart]);
 
   const hasInvalidStock = useMemo(
     () =>
       items.some((item) =>
-        ["OUT_OF_STOCK", "INSUFFICIENT_STOCK", "INACTIVE"].includes(
-          item.stockStatus ?? "IN_STOCK"
-        )
+        ["OUT_OF_STOCK", "INSUFFICIENT_STOCK", "INACTIVE"].includes(item.stockStatus ?? "IN_STOCK")
       ),
     [items]
   );
@@ -79,11 +77,7 @@ export default function Cart() {
 
     const isIncreasing = quantity > item.quantity;
 
-    if (
-      isIncreasing &&
-      item.availableQuantity !== undefined &&
-      quantity > item.availableQuantity
-    ) {
+    if (isIncreasing && item.availableQuantity !== undefined && quantity > item.availableQuantity) {
       setError(`Only ${item.availableQuantity} left for ${item.productName}.`);
       return;
     }
@@ -92,10 +86,7 @@ export default function Cart() {
       setUpdatingItemId(item.itemId);
       setError("");
 
-      const response = await api.put<CartResponse>(
-        `/api/cart/items/${item.itemId}`,
-        { quantity }
-      );
+      const response = await api.put<CartResponse>(`/api/cart/items/${item.itemId}`, { quantity });
 
       setCart(response.data);
     } catch {
@@ -110,9 +101,7 @@ export default function Cart() {
       setUpdatingItemId(item.itemId);
       setError("");
 
-      const response = await api.delete<CartResponse>(
-        `/api/cart/items/${item.itemId}`
-      );
+      const response = await api.delete<CartResponse>(`/api/cart/items/${item.itemId}`);
 
       setCart(response.data);
     } catch {
@@ -144,9 +133,7 @@ export default function Cart() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20 text-slate-500">
-        Loading cart...
-      </div>
+      <div className="flex items-center justify-center py-20 text-slate-500">Loading cart...</div>
     );
   }
 
@@ -155,9 +142,7 @@ export default function Cart() {
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Your Cart</h1>
-          <p className="text-slate-500 mt-2">
-            Review your selected products before checkout.
-          </p>
+          <p className="text-slate-500 mt-2">Review your selected products before checkout.</p>
         </div>
 
         <Link
@@ -177,17 +162,15 @@ export default function Cart() {
 
       {hasInvalidStock && (
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 p-4 rounded-xl">
-          Some items in your cart are no longer available in the requested
-          quantity. Please update your cart before checkout.
+          Some items in your cart are no longer available in the requested quantity. Please update
+          your cart before checkout.
         </div>
       )}
 
       {items.length === 0 && (
         <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
           <Package className="mx-auto h-12 w-12 text-slate-400 mb-4" />
-          <h2 className="text-xl font-semibold text-slate-900">
-            Your cart is empty
-          </h2>
+          <h2 className="text-xl font-semibold text-slate-900">Your cart is empty</h2>
           <p className="text-slate-500 mt-2">
             Add products from the storefront to start a demo order.
           </p>
@@ -208,8 +191,7 @@ export default function Cart() {
             {items.map((item) => {
               const isUpdating = updatingItemId === item.itemId;
               const maxReached =
-                item.availableQuantity !== undefined &&
-                item.quantity >= item.availableQuantity;
+                item.availableQuantity !== undefined && item.quantity >= item.availableQuantity;
 
               return (
                 <div
@@ -218,13 +200,9 @@ export default function Cart() {
                 >
                   <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                     <div className="min-w-0">
-                      <h2 className="text-lg font-semibold text-slate-900">
-                        {item.productName}
-                      </h2>
+                      <h2 className="text-lg font-semibold text-slate-900">{item.productName}</h2>
 
-                      <p className="text-slate-500 mt-1">
-                        R{item.unitPrice.toFixed(2)} each
-                      </p>
+                      <p className="text-slate-500 mt-1">R{item.unitPrice.toFixed(2)} each</p>
 
                       <div
                         className={`mt-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-semibold ${getStockBadgeStyle(
@@ -235,18 +213,14 @@ export default function Cart() {
                         {item.stockMessage ?? "In stock."}
                       </div>
 
-                      <p className="text-blue-600 font-bold mt-3">
-                        R{item.lineTotal.toFixed(2)}
-                      </p>
+                      <p className="text-blue-600 font-bold mt-3">R{item.lineTotal.toFixed(2)}</p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
                       <div className="flex items-center rounded-xl border border-slate-300 bg-slate-50 p-1">
                         <button
                           type="button"
-                          onClick={() =>
-                            updateQuantity(item, item.quantity - 1)
-                          }
+                          onClick={() => updateQuantity(item, item.quantity - 1)}
                           disabled={item.quantity <= 1 || isUpdating}
                           className="h-10 w-10 rounded-lg bg-white text-slate-900 shadow-sm flex items-center justify-center hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
                           aria-label="Decrease quantity"
@@ -260,9 +234,7 @@ export default function Cart() {
 
                         <button
                           type="button"
-                          onClick={() =>
-                            updateQuantity(item, item.quantity + 1)
-                          }
+                          onClick={() => updateQuantity(item, item.quantity + 1)}
                           disabled={isUpdating || maxReached}
                           className="h-10 w-10 rounded-lg bg-white text-slate-900 shadow-sm flex items-center justify-center hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
                           aria-label="Increase quantity"
@@ -298,9 +270,7 @@ export default function Cart() {
 
               <div className="flex justify-between text-slate-600">
                 <span>Total quantity</span>
-                <span>
-                  {items.reduce((sum, item) => sum + item.quantity, 0)}
-                </span>
+                <span>{items.reduce((sum, item) => sum + item.quantity, 0)}</span>
               </div>
 
               <div className="border-t border-slate-200 pt-4 flex justify-between text-xl font-bold text-slate-900">

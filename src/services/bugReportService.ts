@@ -23,9 +23,7 @@ export type BugReportResponse = {
   issueNumber: number;
 };
 
-export async function submitBugReport(
-  request: BugReportRequest
-): Promise<BugReportResponse> {
+export async function submitBugReport(request: BugReportRequest): Promise<BugReportResponse> {
   const response = await api.post("/api/system/bug-reports", request);
   return response.data;
 }

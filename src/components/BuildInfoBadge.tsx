@@ -6,8 +6,7 @@ import { getBackendBuildInfo } from "@/services/buildInfoService";
 import type { BackendBuildInfo } from "@/types/BuildInfo";
 
 export default function BuildInfoBadge() {
-  const [backendBuildInfo, setBackendBuildInfo] =
-    useState<BackendBuildInfo | null>(null);
+  const [backendBuildInfo, setBackendBuildInfo] = useState<BackendBuildInfo | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -40,13 +39,8 @@ export default function BuildInfoBadge() {
         <div>
           <p className="text-slate-500">Frontend</p>
           <p>
-            v{" "}
-            <span className="font-semibold text-white">
-              {FRONTEND_BUILD_INFO.version}
-            </span>{" "}
-            <span className="font-mono text-blue-300">
-              {FRONTEND_BUILD_INFO.commitShort}
-            </span>
+            v <span className="font-semibold text-white">{FRONTEND_BUILD_INFO.version}</span>{" "}
+            <span className="font-mono text-blue-300">{FRONTEND_BUILD_INFO.commitShort}</span>
           </p>
         </div>
 
@@ -54,13 +48,8 @@ export default function BuildInfoBadge() {
           <p className="text-slate-500">Backend</p>
           {backendBuildInfo ? (
             <p>
-              v{" "}
-              <span className="font-semibold text-white">
-                {backendBuildInfo.version}
-              </span>{" "}
-              <span className="font-mono text-emerald-300">
-                {backendBuildInfo.commitShort}
-              </span>
+              v <span className="font-semibold text-white">{backendBuildInfo.version}</span>{" "}
+              <span className="font-mono text-emerald-300">{backendBuildInfo.commitShort}</span>
             </p>
           ) : (
             <p className="text-slate-500">Unavailable</p>

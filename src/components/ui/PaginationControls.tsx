@@ -29,8 +29,7 @@ export default function PaginationControls({
       <p>
         Showing <span className="font-semibold text-white">{start}</span>-
         <span className="font-semibold text-white">{end}</span> of{" "}
-        <span className="font-semibold text-white">{totalItems}</span>{" "}
-        {itemLabel}
+        <span className="font-semibold text-white">{totalItems}</span> {itemLabel}
       </p>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

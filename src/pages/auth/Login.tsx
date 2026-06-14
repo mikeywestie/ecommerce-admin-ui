@@ -58,8 +58,7 @@ export default function Login() {
       saveAuth(auth);
 
       const redirectPath =
-        location.state?.from?.pathname ||
-        (auth.role === "ADMIN" ? "/admin" : "/customer/products");
+        location.state?.from?.pathname || (auth.role === "ADMIN" ? "/admin" : "/customer/products");
 
       navigate(redirectPath, { replace: true });
     } catch {
@@ -115,9 +114,8 @@ export default function Login() {
             </h1>
 
             <p className="mt-5 max-w-xl text-lg text-slate-300">
-              Explore a deployed Spring Boot API, React storefront, admin
-              dashboard, cart, checkout, coupons, stock validation, and payment
-              simulation.
+              Explore a deployed Spring Boot API, React storefront, admin dashboard, cart, checkout,
+              coupons, stock validation, and payment simulation.
             </p>
           </div>
 
@@ -160,14 +158,12 @@ export default function Login() {
             <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-2xl sm:p-8">
               <div className="mb-6">
                 <h1 className="text-3xl font-bold">Sign in</h1>
-                <p className="mt-2 text-slate-400">
-                  Choose an admin or customer demo account.
-                </p>
+                <p className="mt-2 text-slate-400">Choose an admin or customer demo account.</p>
               </div>
 
               <button
                 type="button"
-                 onClick={openInfo}
+                onClick={openInfo}
                 className="mb-6 flex w-full items-center gap-3 rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 text-left transition hover:border-blue-400/70 hover:bg-blue-500/20"
               >
                 <FileText className="h-5 w-5 text-blue-300" />
@@ -195,9 +191,7 @@ export default function Login() {
                     <ShieldCheck className="h-5 w-5 text-blue-400" />
                     <div>
                       <p className="font-semibold">Admin Demo</p>
-                      <p className="text-xs text-slate-400">
-                        Dashboard & inventory
-                      </p>
+                      <p className="text-xs text-slate-400">Dashboard & inventory</p>
                     </div>
                   </div>
                 </button>
@@ -215,9 +209,7 @@ export default function Login() {
                     <ShoppingBag className="h-5 w-5 text-emerald-400" />
                     <div>
                       <p className="font-semibold">Customer Demo</p>
-                      <p className="text-xs text-slate-400">
-                        Storefront & checkout
-                      </p>
+                      <p className="text-xs text-slate-400">Storefront & checkout</p>
                     </div>
                   </div>
                 </button>
@@ -247,9 +239,7 @@ export default function Login() {
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="mb-2 block text-sm text-slate-400">
-                    Email
-                  </label>
+                  <label className="mb-2 block text-sm text-slate-400">Email</label>
 
                   <div className="relative">
                     <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
@@ -267,9 +257,7 @@ export default function Login() {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm text-slate-400">
-                    Password
-                  </label>
+                  <label className="mb-2 block text-sm text-slate-400">Password</label>
 
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
@@ -290,11 +278,7 @@ export default function Login() {
                       className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
                       aria-label={showPassword ? "Hide password" : "Show password"}
                     >
-                      {showPassword ? (
-                        <EyeOff className="h-5 w-5" />
-                      ) : (
-                        <Eye className="h-5 w-5" />
-                      )}
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
                   </div>
                 </div>
@@ -307,8 +291,8 @@ export default function Login() {
                   {loading
                     ? "Signing in..."
                     : selectedDemo === "admin"
-                    ? "Sign In as Admin"
-                    : "Sign In as Customer"}
+                      ? "Sign In as Admin"
+                      : "Sign In as Customer"}
                 </button>
               </form>
 
@@ -320,16 +304,7 @@ export default function Login() {
         </main>
       </div>
 
-      {isInfoOpen && (
-        <DemoDocumentationModal
-          onClose={() => setIsInfoOpen(false)}
-        />
-      )}
+      {isInfoOpen && <DemoDocumentationModal onClose={() => setIsInfoOpen(false)} />}
     </div>
   );
 }
-
-type InfoPillProps = {
-  label: string;
-  value: string;
-};

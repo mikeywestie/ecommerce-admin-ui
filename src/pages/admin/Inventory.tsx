@@ -1,14 +1,6 @@
 import type { FormEvent } from "react";
 import { useEffect, useMemo, useState } from "react";
-import {
-  Archive,
-  Edit,
-  PackagePlus,
-  Save,
-  Search,
-  SlidersHorizontal,
-  X,
-} from "lucide-react";
+import { Archive, Edit, PackagePlus, Save, Search, SlidersHorizontal, X } from "lucide-react";
 
 import Button from "@/components/ui/Button";
 import Notice from "@/components/ui/Notice";
@@ -90,11 +82,7 @@ export default function Inventory() {
 
   const categories = useMemo(() => {
     return Array.from(
-      new Set(
-        inventory
-          .map((item) => item.product.category || "General")
-          .filter(Boolean)
-      )
+      new Set(inventory.map((item) => item.product.category || "General").filter(Boolean))
     ).sort();
   }, [inventory]);
 
@@ -110,8 +98,7 @@ export default function Inventory() {
         (product.description || "").toLowerCase().includes(query);
 
       const matchesCategory =
-        categoryFilter === "ALL" ||
-        (product.category || "General") === categoryFilter;
+        categoryFilter === "ALL" || (product.category || "General") === categoryFilter;
 
       const matchesStatus =
         statusFilter === "ALL" ||
@@ -121,12 +108,8 @@ export default function Inventory() {
       const matchesStock =
         stockFilter === "ALL" ||
         (stockFilter === "OUT" && item.quantityAvailable <= 0) ||
-        (stockFilter === "LOW" &&
-          item.quantityAvailable > 0 &&
-          item.quantityAvailable <= 5) ||
-        (stockFilter === "WARNING" &&
-          item.quantityAvailable > 5 &&
-          item.quantityAvailable <= 10) ||
+        (stockFilter === "LOW" && item.quantityAvailable > 0 && item.quantityAvailable <= 5) ||
+        (stockFilter === "WARNING" && item.quantityAvailable > 5 && item.quantityAvailable <= 10) ||
         (stockFilter === "IN_STOCK" && item.quantityAvailable > 10);
 
       return matchesSearch && matchesCategory && matchesStatus && matchesStock;
@@ -197,10 +180,7 @@ export default function Inventory() {
           initialStock: null,
         });
 
-        await setStockQuantity(
-          selectedItem.product.id,
-          Number(form.initialStock ?? 0)
-        );
+        await setStockQuantity(selectedItem.product.id, Number(form.initialStock ?? 0));
 
         setSuccess("Product updated successfully.");
       }
@@ -215,9 +195,7 @@ export default function Inventory() {
   }
 
   async function handleObsolete(item: InventoryItem) {
-    const confirmed = window.confirm(
-      `Mark "${item.product.name}" as inactive/obsolete?`
-    );
+    const confirmed = window.confirm(`Mark "${item.product.name}" as inactive/obsolete?`);
 
     if (!confirmed) return;
 
@@ -380,14 +358,10 @@ export default function Inventory() {
                   <StatusBadge tone={getStockTone(item.quantityAvailable)}>
                     {getStockLabel(item.quantityAvailable)}
                   </StatusBadge>
-                  <span className="text-xs text-slate-500">
-                    Product #{item.product.id}
-                  </span>
+                  <span className="text-xs text-slate-500">Product #{item.product.id}</span>
                 </div>
 
-                <h2 className="text-lg font-bold text-white">
-                  {item.product.name}
-                </h2>
+                <h2 className="text-lg font-bold text-white">{item.product.name}</h2>
 
                 <p className="mt-1 line-clamp-2 text-sm text-slate-400">
                   {item.product.description || "No description captured yet."}
@@ -395,31 +369,19 @@ export default function Inventory() {
               </div>
 
               <div>
-                <p className="text-xs uppercase tracking-wide text-slate-500">
-                  Category
-                </p>
-                <p className="font-semibold text-slate-200">
-                  {item.product.category || "General"}
-                </p>
+                <p className="text-xs uppercase tracking-wide text-slate-500">Category</p>
+                <p className="font-semibold text-slate-200">{item.product.category || "General"}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2">
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-500">
-                    Price
-                  </p>
-                  <p className="font-bold text-blue-300">
-                    R {item.product.price.toFixed(2)}
-                  </p>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Price</p>
+                  <p className="font-bold text-blue-300">R {item.product.price.toFixed(2)}</p>
                 </div>
 
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-500">
-                    Qty
-                  </p>
-                  <p className="font-bold text-white">
-                    {item.quantityAvailable}
-                  </p>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Qty</p>
+                  <p className="font-bold text-white">{item.quantityAvailable}</p>
                 </div>
               </div>
 
@@ -432,10 +394,7 @@ export default function Inventory() {
                   Edit
                 </Button>
 
-                <Button
-                  variant="ghost"
-                  onClick={() => handleQuickStockUpdate(item)}
-                >
+                <Button variant="ghost" onClick={() => handleQuickStockUpdate(item)}>
                   Stock
                 </Button>
 
@@ -506,23 +465,17 @@ export default function Inventory() {
                   <input
                     required
                     value={form.name}
-                    onChange={(event) =>
-                      setForm({ ...form, name: event.target.value })
-                    }
+                    onChange={(event) => setForm({ ...form, name: event.target.value })}
                     className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
                   />
                 </label>
 
                 <label>
-                  <span className="mb-2 block text-sm text-slate-400">
-                    Category
-                  </span>
+                  <span className="mb-2 block text-sm text-slate-400">Category</span>
                   <input
                     required
                     value={form.category}
-                    onChange={(event) =>
-                      setForm({ ...form, category: event.target.value })
-                    }
+                    onChange={(event) => setForm({ ...form, category: event.target.value })}
                     className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
                   />
                 </label>
@@ -535,17 +488,13 @@ export default function Inventory() {
                     step="0.01"
                     type="number"
                     value={form.price}
-                    onChange={(event) =>
-                      setForm({ ...form, price: Number(event.target.value) })
-                    }
+                    onChange={(event) => setForm({ ...form, price: Number(event.target.value) })}
                     className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
                   />
                 </label>
 
                 <label>
-                  <span className="mb-2 block text-sm text-slate-400">
-                    Stock Quantity
-                  </span>
+                  <span className="mb-2 block text-sm text-slate-400">Stock Quantity</span>
                   <input
                     required
                     min="0"
@@ -562,28 +511,20 @@ export default function Inventory() {
                 </label>
 
                 <label className="md:col-span-2">
-                  <span className="mb-2 block text-sm text-slate-400">
-                    Image URL
-                  </span>
+                  <span className="mb-2 block text-sm text-slate-400">Image URL</span>
                   <input
                     value={form.imageUrl}
-                    onChange={(event) =>
-                      setForm({ ...form, imageUrl: event.target.value })
-                    }
+                    onChange={(event) => setForm({ ...form, imageUrl: event.target.value })}
                     placeholder="Optional. Preview appears here when populated."
                     className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
                   />
                 </label>
 
                 <label className="md:col-span-2">
-                  <span className="mb-2 block text-sm text-slate-400">
-                    Description
-                  </span>
+                  <span className="mb-2 block text-sm text-slate-400">Description</span>
                   <textarea
                     value={form.description}
-                    onChange={(event) =>
-                      setForm({ ...form, description: event.target.value })
-                    }
+                    onChange={(event) => setForm({ ...form, description: event.target.value })}
                     rows={4}
                     className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
                   />
@@ -593,9 +534,7 @@ export default function Inventory() {
                   <input
                     type="checkbox"
                     checked={form.active}
-                    onChange={(event) =>
-                      setForm({ ...form, active: event.target.checked })
-                    }
+                    onChange={(event) => setForm({ ...form, active: event.target.checked })}
                     className="h-4 w-4 rounded border-slate-600 bg-slate-900 text-blue-600"
                   />
                   Active product

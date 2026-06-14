@@ -114,37 +114,23 @@ export default function Payments() {
           >
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[0.7fr_0.7fr_1fr_0.8fr_auto] lg:items-center">
               <div>
-                <p className="text-xs uppercase tracking-wide text-slate-500">
-                  Payment
-                </p>
+                <p className="text-xs uppercase tracking-wide text-slate-500">Payment</p>
                 <p className="text-xl font-bold text-white">#{payment.id}</p>
               </div>
 
               <div>
-                <p className="text-xs uppercase tracking-wide text-slate-500">
-                  Order
-                </p>
-                <p className="font-semibold text-slate-200">
-                  #{payment.orderId}
-                </p>
+                <p className="text-xs uppercase tracking-wide text-slate-500">Order</p>
+                <p className="font-semibold text-slate-200">#{payment.orderId}</p>
               </div>
 
               <div>
-                <p className="text-xs uppercase tracking-wide text-slate-500">
-                  Method
-                </p>
-                <p className="font-semibold text-slate-200">
-                  {payment.paymentMethod}
-                </p>
+                <p className="text-xs uppercase tracking-wide text-slate-500">Method</p>
+                <p className="font-semibold text-slate-200">{payment.paymentMethod}</p>
               </div>
 
               <div>
-                <p className="text-xs uppercase tracking-wide text-slate-500">
-                  Amount
-                </p>
-                <p className="font-bold text-blue-300">
-                  R {payment.amount.toFixed(2)}
-                </p>
+                <p className="text-xs uppercase tracking-wide text-slate-500">Amount</p>
+                <p className="font-bold text-blue-300">R {payment.amount.toFixed(2)}</p>
               </div>
 
               <div className="flex flex-wrap items-center gap-2 lg:justify-end">

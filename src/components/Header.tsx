@@ -24,9 +24,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
   const title =
     pageTitles[location.pathname] ||
-    (location.pathname.startsWith("/customer/products/")
-      ? "Product Details"
-      : "E-Commerce Demo");
+    (location.pathname.startsWith("/customer/products/") ? "Product Details" : "E-Commerce Demo");
 
   return (
     <header className="sticky top-0 z-30 h-16 border-b border-slate-800 bg-slate-900/95 backdrop-blur flex items-center justify-between px-4 md:px-6">
@@ -41,9 +39,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
         </button>
 
         <div className="min-w-0">
-          <h2 className="text-lg md:text-xl font-semibold truncate">
-            {title}
-          </h2>
+          <h2 className="text-lg md:text-xl font-semibold truncate">{title}</h2>
           <p className="text-xs text-slate-500">
             {role === "ADMIN" ? "Admin experience" : "Customer experience"}
           </p>

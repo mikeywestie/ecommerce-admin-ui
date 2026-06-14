@@ -49,18 +49,13 @@ export default function Checkout() {
 
   const [cart, setCart] = useState<CartResponse | null>(null);
   const [couponCode, setCouponCode] = useState("");
-  const [paymentSimulation, setPaymentSimulation] =
-    useState<PaymentSimulation>("SUCCESS");
+  const [paymentSimulation, setPaymentSimulation] = useState<PaymentSimulation>("SUCCESS");
   const [loading, setLoading] = useState(true);
   const [placingOrder, setPlacingOrder] = useState(false);
   const [applyingCoupon, setApplyingCoupon] = useState(false);
   const [removingCoupon, setRemovingCoupon] = useState(false);
   const [error, setError] = useState("");
   const [couponMessage, setCouponMessage] = useState("");
-
-  useEffect(() => {
-    loadCart();
-  }, []);
 
   async function loadCart() {
     try {
@@ -77,6 +72,14 @@ export default function Checkout() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadCart();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   async function applyCoupon(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -175,9 +178,7 @@ export default function Checkout() {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center">
         <Package className="mx-auto mb-4 h-12 w-12 text-slate-400" />
-        <h1 className="text-2xl font-bold text-slate-900">
-          Nothing to checkout
-        </h1>
+        <h1 className="text-2xl font-bold text-slate-900">Nothing to checkout</h1>
         <p className="mt-2 text-slate-500">
           Your cart is empty. Add products before placing an order.
         </p>
@@ -198,8 +199,8 @@ export default function Checkout() {
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <h1 className="text-3xl font-bold text-slate-900">Checkout</h1>
         <p className="mt-2 text-slate-500">
-          Apply a coupon, review your total, and choose a demo payment outcome
-          for the pilot walkthrough.
+          Apply a coupon, review your total, and choose a demo payment outcome for the pilot
+          walkthrough.
         </p>
       </div>
 
@@ -227,17 +228,13 @@ export default function Checkout() {
                   className="grid gap-2 py-4 sm:grid-cols-[1fr_auto] sm:items-center"
                 >
                   <div>
-                    <p className="font-semibold text-slate-900">
-                      {item.productName}
-                    </p>
+                    <p className="font-semibold text-slate-900">{item.productName}</p>
                     <p className="text-sm text-slate-500">
                       Qty {item.quantity} × R{item.unitPrice.toFixed(2)}
                     </p>
                   </div>
 
-                  <p className="font-bold text-blue-600">
-                    R{item.lineTotal.toFixed(2)}
-                  </p>
+                  <p className="font-bold text-blue-600">R{item.lineTotal.toFixed(2)}</p>
                 </div>
               ))}
             </div>
@@ -247,12 +244,8 @@ export default function Checkout() {
             <div className="flex items-center gap-3">
               <BadgePercent className="h-6 w-6 text-blue-600" />
               <div>
-                <h2 className="text-xl font-bold text-slate-900">
-                  Coupon Code
-                </h2>
-                <p className="text-sm text-slate-500">
-                  Try SAVE10, WELCOME250, FIRSTBUY, or VIP5.
-                </p>
+                <h2 className="text-xl font-bold text-slate-900">Coupon Code</h2>
+                <p className="text-sm text-slate-500">Try SAVE10, WELCOME250, FIRSTBUY, or VIP5.</p>
               </div>
             </div>
 
@@ -262,9 +255,7 @@ export default function Checkout() {
                   <Tag className="h-5 w-5" />
                   <div>
                     <p className="font-bold">{cart?.couponCode}</p>
-                    <p className="text-sm">
-                      Coupon discount applied to this order.
-                    </p>
+                    <p className="text-sm">Coupon discount applied to this order.</p>
                   </div>
                 </div>
 
@@ -278,10 +269,7 @@ export default function Checkout() {
                 </Button>
               </div>
             ) : (
-              <form
-                onSubmit={applyCoupon}
-                className="mt-6 flex flex-col gap-3 sm:flex-row"
-              >
+              <form onSubmit={applyCoupon} className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <input
                   type="text"
                   value={couponCode}
@@ -340,7 +328,9 @@ export default function Checkout() {
                 <XCircle className="h-5 w-5" />
                 <div>
                   <p className="font-bold">Simulate payment failed</p>
-                  <p className="text-sm">Frontend is ready; backend must honour paymentOutcome=FAILED.</p>
+                  <p className="text-sm">
+                    Frontend is ready; backend must honour paymentOutcome=FAILED.
+                  </p>
                 </div>
               </div>
             </button>
@@ -382,8 +372,8 @@ export default function Checkout() {
             {placingOrder
               ? "Placing Order..."
               : paymentSimulation === "FAILED"
-              ? "Place Failed Demo Order"
-              : "Place Paid Demo Order"}
+                ? "Place Failed Demo Order"
+                : "Place Paid Demo Order"}
           </Button>
 
           <Link

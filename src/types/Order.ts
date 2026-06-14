@@ -1,9 +1,4 @@
-export type OrderStatus =
-  | "CREATED"
-  | "PENDING"
-  | "PAID"
-  | "PAYMENT_FAILED"
-  | "CANCELLED";
+export type OrderStatus = "CREATED" | "PENDING" | "PAID" | "PAYMENT_FAILED" | "CANCELLED";
 
 export type OrderItem = {
   productId: number;

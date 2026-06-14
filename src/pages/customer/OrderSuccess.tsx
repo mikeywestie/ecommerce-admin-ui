@@ -44,9 +44,7 @@ export default function OrderSuccess() {
           <div className="flex justify-between py-2">
             <span className="text-slate-500">Status</span>
             <span
-              className={`font-semibold ${
-                isPaymentFailed ? "text-red-600" : "text-slate-900"
-              }`}
+              className={`font-semibold ${isPaymentFailed ? "text-red-600" : "text-slate-900"}`}
             >
               {order.status}
             </span>
@@ -54,16 +52,12 @@ export default function OrderSuccess() {
 
           <div className="flex justify-between py-2">
             <span className="text-slate-500">Customer</span>
-            <span className="font-semibold text-slate-900">
-              {order.customerEmail}
-            </span>
+            <span className="font-semibold text-slate-900">{order.customerEmail}</span>
           </div>
 
           <div className="flex justify-between py-2 border-t border-slate-200 mt-2 pt-4">
             <span className="text-slate-500">Total</span>
-            <span className="font-bold text-blue-600">
-              R{order.totalAmount.toFixed(2)}
-            </span>
+            <span className="font-bold text-blue-600">R{order.totalAmount.toFixed(2)}</span>
           </div>
         </div>
       )}

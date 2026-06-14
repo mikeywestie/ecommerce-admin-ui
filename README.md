@@ -17,18 +17,18 @@ This application includes both an **Admin Portal** and a **Customer Storefront**
 
 ## 🚀 Live Demo
 
-| Resource | URL |
-|---|---|
+| Resource             | URL                                               |
+| -------------------- | ------------------------------------------------- |
 | Frontend Application | https://mikeywestie.github.io/ecommerce-admin-ui/ |
-| Backend API | https://ecommerce-api-xrkk.onrender.com |
-| Backend Repository | https://github.com/mikeywestie/ecommerce-api |
+| Backend API          | https://ecommerce-api-xrkk.onrender.com           |
+| Backend Repository   | https://github.com/mikeywestie/ecommerce-api      |
 
 ---
 
 ## 📦 Current Release
 
-| Component | Version |
-|---|---|
+| Component   | Version  |
+| ----------- | -------- |
 | Frontend UI | `v1.3.0` |
 | Backend API | `v1.8.0` |
 

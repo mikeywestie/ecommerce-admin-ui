@@ -14,10 +14,7 @@ const toneClasses: Record<StatusTone, string> = {
   purple: "bg-violet-500/15 text-violet-300 border-violet-500/20",
 };
 
-export default function StatusBadge({
-  children,
-  tone = "slate",
-}: StatusBadgeProps) {
+export default function StatusBadge({ children, tone = "slate" }: StatusBadgeProps) {
   return (
     <span
       className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${toneClasses[tone]}`}
