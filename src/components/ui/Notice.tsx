@@ -12,9 +12,5 @@ const toneClasses: Record<NoticeTone, string> = {
 };
 
 export default function Notice({ tone, children }: NoticeProps) {
-  return (
-    <div className={`rounded-2xl border p-4 text-sm ${toneClasses[tone]}`}>
-      {children}
-    </div>
-  );
+  return <div className={`rounded-2xl border p-4 text-sm ${toneClasses[tone]}`}>{children}</div>;
 }

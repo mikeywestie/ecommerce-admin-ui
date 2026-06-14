@@ -24,10 +24,6 @@ export default function CustomerOrders() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  useEffect(() => {
-    loadOrders();
-  }, []);
-
   async function loadOrders() {
     try {
       setLoading(true);
@@ -41,6 +37,14 @@ export default function CustomerOrders() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadOrders();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   async function cancelOrder(orderId: number) {
     const confirmed = window.confirm(
@@ -68,15 +72,11 @@ export default function CustomerOrders() {
 
   const visibleOrders = useMemo(() => {
     return [...orders].sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
   }, [orders]);
 
-  const paginatedOrders = visibleOrders.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  const paginatedOrders = visibleOrders.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   if (loading) {
     return (
@@ -109,42 +109,30 @@ export default function CustomerOrders() {
             >
               <div className="grid gap-4 lg:grid-cols-[0.7fr_1fr_0.8fr_auto] lg:items-center">
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-400">
-                    Order
-                  </p>
+                  <p className="text-xs uppercase tracking-wide text-slate-400">Order</p>
                   <p className="text-xl font-bold text-slate-900">#{order.id}</p>
                 </div>
 
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-400">
-                    Date
-                  </p>
+                  <p className="text-xs uppercase tracking-wide text-slate-400">Date</p>
                   <p className="font-semibold text-slate-700">
                     {new Date(order.createdAt).toLocaleString()}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-400">
-                    Total
-                  </p>
-                  <p className="font-bold text-blue-600">
-                    R {order.totalAmount.toFixed(2)}
-                  </p>
+                  <p className="text-xs uppercase tracking-wide text-slate-400">Total</p>
+                  <p className="font-bold text-blue-600">R {order.totalAmount.toFixed(2)}</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-                  <StatusBadge tone={getStatusTone(order.status)}>
-                    {order.status}
-                  </StatusBadge>
+                  <StatusBadge tone={getStatusTone(order.status)}>{order.status}</StatusBadge>
 
                   <Button
                     variant="secondary"
                     size="sm"
                     onClick={() =>
-                      setExpandedOrderId((currentId) =>
-                        currentId === order.id ? null : order.id
-                      )
+                      setExpandedOrderId((currentId) => (currentId === order.id ? null : order.id))
                     }
                     icon={
                       expanded ? (
@@ -165,9 +153,7 @@ export default function CustomerOrders() {
                       disabled={cancellingOrderId === order.id}
                       icon={<RefreshCcw className="h-4 w-4" />}
                     >
-                      {cancellingOrderId === order.id
-                        ? "Cancelling..."
-                        : "Cancel / Refund"}
+                      {cancellingOrderId === order.id ? "Cancelling..." : "Cancel / Refund"}
                     </Button>
                   )}
                 </div>
@@ -180,23 +166,15 @@ export default function CustomerOrders() {
                       key={`${order.id}-${item.productId}`}
                       className="grid gap-2 rounded-xl bg-white p-3 sm:grid-cols-[1fr_auto_auto_auto] sm:items-center"
                     >
-                      <p className="font-semibold text-slate-900">
-                        {item.productName}
-                      </p>
+                      <p className="font-semibold text-slate-900">{item.productName}</p>
                       <p className="text-sm text-slate-500">Qty {item.quantity}</p>
-                      <p className="text-sm text-slate-500">
-                        R {item.unitPrice.toFixed(2)}
-                      </p>
-                      <p className="font-bold text-blue-600">
-                        R {item.lineTotal.toFixed(2)}
-                      </p>
+                      <p className="text-sm text-slate-500">R {item.unitPrice.toFixed(2)}</p>
+                      <p className="font-bold text-blue-600">R {item.lineTotal.toFixed(2)}</p>
                     </div>
                   ))}
 
                   {order.items.length === 0 && (
-                    <p className="text-center text-slate-500">
-                      No items found for this order.
-                    </p>
+                    <p className="text-center text-slate-500">No items found for this order.</p>
                   )}
                 </div>
               )}

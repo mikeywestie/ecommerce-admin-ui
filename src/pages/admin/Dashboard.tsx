@@ -4,14 +4,7 @@ import StatCard from "../../components/StatCard";
 import { getDashboardSummary } from "../../services/dashboardService";
 import type { DashboardSummary } from "../../types/DashboardSummary";
 
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function Dashboard() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
@@ -43,10 +36,7 @@ export default function Dashboard() {
       <div className="p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((item) => (
-            <div
-              key={item}
-              className="h-32 bg-slate-800 rounded-2xl animate-pulse"
-            />
+            <div key={item} className="h-32 bg-slate-800 rounded-2xl animate-pulse" />
           ))}
         </div>
 
@@ -112,9 +102,7 @@ export default function Dashboard() {
 
       <div className="bg-slate-800 p-6 rounded-2xl">
         <h2 className="text-2xl font-bold mb-2">Revenue</h2>
-        <p className="text-4xl font-bold">
-          R {summary.totalRevenue.toFixed(2)}
-        </p>
+        <p className="text-4xl font-bold">R {summary.totalRevenue.toFixed(2)}</p>
         <p className="text-slate-400 mt-2">Revenue from paid orders</p>
       </div>
 
@@ -135,12 +123,7 @@ export default function Dashboard() {
                 }}
                 labelStyle={{ color: "#ffffff" }}
               />
-              <Bar
-                dataKey="count"
-                fill="#3b82f6"
-                radius={[8, 8, 0, 0]}
-                isAnimationActive={false}
-              />
+              <Bar dataKey="count" fill="#3b82f6" radius={[8, 8, 0, 0]} isAnimationActive={false} />
             </BarChart>
           </ResponsiveContainer>
         </div>

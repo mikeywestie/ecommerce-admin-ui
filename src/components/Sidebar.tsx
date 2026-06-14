@@ -73,9 +73,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
               {isAdmin ? "Ecommerce Admin" : "Ecommerce Store"}
             </h1>
 
-            <p className="mt-2 truncate text-xs text-slate-500">
-              {email || "Signed in"}
-            </p>
+            <p className="mt-2 truncate text-xs text-slate-500">{email || "Signed in"}</p>
 
             <span className="mt-3 inline-flex rounded-full bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-300">
               {isAdmin ? "Admin Portal" : "Customer Portal"}

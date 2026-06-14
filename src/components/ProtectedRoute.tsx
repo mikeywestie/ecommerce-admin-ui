@@ -6,10 +6,7 @@ type ProtectedRouteProps = {
   allowedRoles?: string[];
 };
 
-export default function ProtectedRoute({
-  children,
-  allowedRoles = [],
-}: ProtectedRouteProps) {
+export default function ProtectedRoute({ children, allowedRoles = [] }: ProtectedRouteProps) {
   const token = localStorage.getItem("token");
   const role = localStorage.getItem("role");
 

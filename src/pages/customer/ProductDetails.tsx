@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -12,12 +12,7 @@ import { Link, useParams } from "react-router-dom";
 
 import api from "../../services/api";
 
-type StockStatus =
-  | "IN_STOCK"
-  | "ALMOST_SOLD_OUT"
-  | "LOW_STOCK"
-  | "OUT_OF_STOCK"
-  | "INACTIVE";
+type StockStatus = "IN_STOCK" | "ALMOST_SOLD_OUT" | "LOW_STOCK" | "OUT_OF_STOCK" | "INACTIVE";
 
 type Product = {
   id: number;
@@ -33,12 +28,6 @@ type Product = {
   createdAt?: string;
 };
 
-function getSearchText(product: Product) {
-  return `${product.name ?? ""} ${product.category ?? ""} ${
-    product.description ?? ""
-  }`.toLowerCase();
-}
-
 function getProductDescription(product: Product) {
   const description = product.description?.trim();
 
@@ -46,7 +35,7 @@ function getProductDescription(product: Product) {
     return description;
   }
 
-  return "A demo store product ready to add to cart and use in the checkout flow.";
+  return "";
 }
 
 export default function ProductDetails() {
@@ -59,17 +48,43 @@ export default function ProductDetails() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  useEffect(() => {
-    loadProduct();
+  const loadProduct = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
+      setSuccess("");
+
+      const response = await api.get<Product>(`/api/products/${id}`);
+      setProduct(response.data);
+
+      const stock = response.data.availableQuantity ?? 0;
+
+      if (stock <= 0) {
+        setQuantity(1);
+      } else {
+        setQuantity((current) => Math.min(Math.max(current, 1), stock));
+      }
+    } catch {
+      setError("Unable to load product details.");
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadProduct();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [loadProduct]);
 
   const availableQuantity = product?.availableQuantity ?? 0;
   const stockStatus = product?.stockStatus ?? "OUT_OF_STOCK";
   const isInactive = product?.active === false || stockStatus === "INACTIVE";
   const isOutOfStock = stockStatus === "OUT_OF_STOCK" || availableQuantity <= 0;
 
-  const canAddToCart =
-    !!product && !isInactive && !isOutOfStock && quantity <= availableQuantity;
+  const canAddToCart = !!product && !isInactive && !isOutOfStock && quantity <= availableQuantity;
 
   const stockDisplay = useMemo(() => {
     if (isInactive) {
@@ -106,29 +121,6 @@ export default function ProductDetails() {
       icon: <CheckCircle2 size={16} />,
     };
   }, [availableQuantity, isInactive, isOutOfStock, product, stockStatus]);
-
-  async function loadProduct() {
-    try {
-      setLoading(true);
-      setError("");
-      setSuccess("");
-
-      const response = await api.get<Product>(`/api/products/${id}`);
-      setProduct(response.data);
-
-      const stock = response.data.availableQuantity ?? 0;
-
-      if (stock <= 0) {
-        setQuantity(1);
-      } else {
-        setQuantity((current) => Math.min(Math.max(current, 1), stock));
-      }
-    } catch {
-      setError("Unable to load product details.");
-    } finally {
-      setLoading(false);
-    }
-  }
 
   function decreaseQuantity() {
     setSuccess("");
@@ -265,32 +257,22 @@ export default function ProductDetails() {
               </span>
             </div>
 
-            <h1 className="text-3xl font-bold text-slate-900">
-              {product.name}
-            </h1>
+            <h1 className="text-3xl font-bold text-slate-900">{product.name}</h1>
 
-            <p className="text-slate-500 mt-4 leading-7">
-              {getProductDescription(product)}
-            </p>
+            <p className="text-slate-500 mt-4 leading-7">{getProductDescription(product)}</p>
 
-            <div className="mt-8 text-4xl font-bold text-blue-600">
-              R{product.price.toFixed(2)}
-            </div>
+            <div className="mt-8 text-4xl font-bold text-blue-600">R{product.price.toFixed(2)}</div>
 
             <div className="mt-8 rounded-2xl bg-slate-50 border border-slate-200 p-4 flex items-start gap-3 text-slate-600">
               <Package className="h-5 w-5 text-slate-400 mt-0.5" />
               <div>
-                <p className="font-semibold text-slate-700">
-                  Live stock check
-                </p>
+                <p className="font-semibold text-slate-700">Live stock check</p>
                 <p className="text-sm mt-1">{stockDisplay.message}</p>
               </div>
             </div>
 
             <div className="mt-8">
-              <p className="text-sm font-semibold text-slate-700 mb-3">
-                Quantity
-              </p>
+              <p className="text-sm font-semibold text-slate-700 mb-3">Quantity</p>
 
               <div className="flex items-center rounded-xl border border-slate-300 bg-slate-50 p-1 w-fit">
                 <button
@@ -310,12 +292,7 @@ export default function ProductDetails() {
                 <button
                   type="button"
                   onClick={increaseQuantity}
-                  disabled={
-                    adding ||
-                    isOutOfStock ||
-                    isInactive ||
-                    quantity >= availableQuantity
-                  }
+                  disabled={adding || isOutOfStock || isInactive || quantity >= availableQuantity}
                   className="h-12 w-12 rounded-lg bg-white text-slate-900 shadow-sm flex items-center justify-center hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
                   aria-label="Increase quantity"
                 >
@@ -340,10 +317,10 @@ export default function ProductDetails() {
               {adding
                 ? "Adding..."
                 : isOutOfStock
-                ? "Out of Stock"
-                : isInactive
-                ? "Unavailable"
-                : "Add to Cart"}
+                  ? "Out of Stock"
+                  : isInactive
+                    ? "Unavailable"
+                    : "Add to Cart"}
             </button>
 
             <Link

@@ -10,8 +10,7 @@ type DisplayStatus = "UP" | "DOWN" | "OUT_OF_SERVICE" | "NOT_EXPOSED";
 
 export default function SystemHealth() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
-  const [backendBuildInfo, setBackendBuildInfo] =
-    useState<BackendBuildInfo | null>(null);
+  const [backendBuildInfo, setBackendBuildInfo] = useState<BackendBuildInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -75,10 +74,7 @@ export default function SystemHealth() {
 
         <div className="space-y-4">
           {[1, 2, 3, 4, 5].map((item) => (
-            <div
-              key={item}
-              className="h-16 animate-pulse rounded-xl bg-slate-800"
-            />
+            <div key={item} className="h-16 animate-pulse rounded-xl bg-slate-800" />
           ))}
         </div>
       </div>
@@ -129,8 +125,8 @@ export default function SystemHealth() {
         <div>
           <h1 className="text-3xl font-bold">System Health</h1>
           <p className="mt-2 text-slate-400">
-            Live API availability, frontend/backend build versions, and
-            production health visibility.
+            Live API availability, frontend/backend build versions, and production health
+            visibility.
           </p>
         </div>
 
@@ -144,9 +140,7 @@ export default function SystemHealth() {
 
       <div className="mb-6 grid grid-cols-1 gap-4 xl:grid-cols-2">
         <div className="rounded-2xl border border-blue-500/20 bg-slate-800 p-5">
-          <p className="text-sm font-semibold uppercase tracking-wide text-blue-300">
-            Frontend
-          </p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-blue-300">Frontend</p>
 
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <InfoItem label="Version" value={FRONTEND_BUILD_INFO.version} />
@@ -160,9 +154,7 @@ export default function SystemHealth() {
         </div>
 
         <div className="rounded-2xl border border-emerald-500/20 bg-slate-800 p-5">
-          <p className="text-sm font-semibold uppercase tracking-wide text-emerald-300">
-            Backend
-          </p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-emerald-300">Backend</p>
 
           {backendBuildInfo ? (
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -178,9 +170,7 @@ export default function SystemHealth() {
               />
             </div>
           ) : (
-            <p className="mt-4 text-sm text-slate-400">
-              Backend build information is unavailable.
-            </p>
+            <p className="mt-4 text-sm text-slate-400">Backend build information is unavailable.</p>
           )}
         </div>
       </div>
@@ -219,8 +209,8 @@ export default function SystemHealth() {
 
       {productionDetailsHidden && (
         <div className="mt-6 rounded-2xl border border-yellow-500/30 bg-yellow-500/10 p-4 text-sm text-yellow-300">
-          Detailed component health is intentionally restricted in production.
-          The public health endpoint confirms the application is available.
+          Detailed component health is intentionally restricted in production. The public health
+          endpoint confirms the application is available.
         </div>
       )}
 
@@ -256,13 +246,7 @@ function InfoItem({
   return (
     <div>
       <p className="text-xs uppercase tracking-wide text-slate-500">{label}</p>
-      <p
-        className={`mt-1 truncate font-semibold text-white ${
-          mono ? "font-mono" : ""
-        }`}
-      >
-        {value}
-      </p>
+      <p className={`mt-1 truncate font-semibold text-white ${mono ? "font-mono" : ""}`}>{value}</p>
     </div>
   );
 }

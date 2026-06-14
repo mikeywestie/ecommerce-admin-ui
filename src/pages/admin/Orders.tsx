@@ -9,13 +9,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import type { Order } from "../../types/Order";
 import { getOrders } from "../../services/orderService";
 
-type SortField =
-  | "id"
-  | "customerName"
-  | "customerEmail"
-  | "totalAmount"
-  | "status"
-  | "createdAt";
+type SortField = "id" | "customerName" | "customerEmail" | "totalAmount" | "status" | "createdAt";
 
 type SortDirection = "asc" | "desc";
 
@@ -80,21 +74,13 @@ export default function Orders() {
     });
 
     return [...filteredOrders].sort((a, b) => {
-      let firstValue: string | number = "";
-      let secondValue: string | number = "";
+      const firstValue = sortField === "createdAt" ? new Date(a.createdAt).getTime() : a[sortField];
 
-      if (sortField === "createdAt") {
-        firstValue = new Date(a.createdAt).getTime();
-        secondValue = new Date(b.createdAt).getTime();
-      } else {
-        firstValue = a[sortField];
-        secondValue = b[sortField];
-      }
+      const secondValue =
+        sortField === "createdAt" ? new Date(b.createdAt).getTime() : b[sortField];
 
       if (typeof firstValue === "number" && typeof secondValue === "number") {
-        return sortDirection === "asc"
-          ? firstValue - secondValue
-          : secondValue - firstValue;
+        return sortDirection === "asc" ? firstValue - secondValue : secondValue - firstValue;
       }
 
       return sortDirection === "asc"
@@ -103,10 +89,7 @@ export default function Orders() {
     });
   }, [orders, searchTerm, sortDirection, sortField]);
 
-  const paginatedOrders = sortedOrders.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
+  const paginatedOrders = sortedOrders.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   if (loading) {
     return (
@@ -169,9 +152,7 @@ export default function Orders() {
 
         <Button
           variant="secondary"
-          onClick={() =>
-            setSortDirection((direction) => (direction === "asc" ? "desc" : "asc"))
-          }
+          onClick={() => setSortDirection((direction) => (direction === "asc" ? "desc" : "asc"))}
         >
           {sortDirection === "asc" ? "Ascending" : "Descending"}
         </Button>
@@ -188,49 +169,35 @@ export default function Orders() {
             >
               <div className="grid gap-4 lg:grid-cols-[0.8fr_1.2fr_0.9fr_0.7fr_auto] lg:items-center">
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-500">
-                    Order
-                  </p>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Order</p>
                   <p className="text-xl font-bold text-white">#{order.id}</p>
                 </div>
 
                 <div className="min-w-0">
                   <p className="font-semibold text-white">{order.customerName}</p>
-                  <p className="truncate text-sm text-slate-400">
-                    {order.customerEmail}
-                  </p>
+                  <p className="truncate text-sm text-slate-400">{order.customerEmail}</p>
                 </div>
 
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-500">
-                    Created
-                  </p>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Created</p>
                   <p className="font-semibold text-slate-200">
                     {new Date(order.createdAt).toLocaleDateString()}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-slate-500">
-                    Total
-                  </p>
-                  <p className="font-bold text-blue-300">
-                    R {order.totalAmount.toFixed(2)}
-                  </p>
+                  <p className="text-xs uppercase tracking-wide text-slate-500">Total</p>
+                  <p className="font-bold text-blue-300">R {order.totalAmount.toFixed(2)}</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-                  <StatusBadge tone={getStatusTone(order.status)}>
-                    {order.status}
-                  </StatusBadge>
+                  <StatusBadge tone={getStatusTone(order.status)}>{order.status}</StatusBadge>
 
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() =>
-                      setExpandedOrderId((currentId) =>
-                        currentId === order.id ? null : order.id
-                      )
+                      setExpandedOrderId((currentId) => (currentId === order.id ? null : order.id))
                     }
                     icon={
                       expanded ? (
@@ -260,18 +227,10 @@ export default function Orders() {
                         key={`${order.id}-${item.productId}`}
                         className="grid gap-2 rounded-xl border border-slate-800 bg-slate-900 p-3 sm:grid-cols-[1fr_auto_auto_auto] sm:items-center"
                       >
-                        <p className="font-semibold text-white">
-                          {item.productName}
-                        </p>
-                        <p className="text-sm text-slate-400">
-                          Qty {item.quantity}
-                        </p>
-                        <p className="text-sm text-slate-400">
-                          R {item.unitPrice.toFixed(2)}
-                        </p>
-                        <p className="font-bold text-blue-300">
-                          R {item.lineTotal.toFixed(2)}
-                        </p>
+                        <p className="font-semibold text-white">{item.productName}</p>
+                        <p className="text-sm text-slate-400">Qty {item.quantity}</p>
+                        <p className="text-sm text-slate-400">R {item.unitPrice.toFixed(2)}</p>
+                        <p className="font-bold text-blue-300">R {item.lineTotal.toFixed(2)}</p>
                       </div>
                     ))}
 

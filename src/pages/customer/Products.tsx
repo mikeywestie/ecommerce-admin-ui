@@ -47,10 +47,6 @@ export default function Products() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  useEffect(() => {
-    loadProducts();
-  }, []);
-
   async function loadProducts() {
     try {
       setLoading(true);
@@ -68,6 +64,14 @@ export default function Products() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void loadProducts();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   async function addToCart(productId: number) {
     try {
@@ -106,14 +110,11 @@ export default function Products() {
       .filter((product) => product.active !== false)
       .filter((product) => {
         const matchesCategory =
-          categoryFilter === "ALL" ||
-          (product.category || "General") === categoryFilter;
+          categoryFilter === "ALL" || (product.category || "General") === categoryFilter;
 
         const matchesSearch =
           !query ||
-          `${product.name} ${product.category ?? ""} ${
-            product.description ?? ""
-          }`
+          `${product.name} ${product.category ?? ""} ${product.description ?? ""}`
             .toLowerCase()
             .includes(query);
 
@@ -139,8 +140,8 @@ export default function Products() {
       <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
         <h1 className="text-3xl font-bold text-slate-900">Browse Products</h1>
         <p className="mt-2 text-slate-500">
-          Discover demo products, filter the full catalog, add items to your
-          cart, and simulate paid or failed checkout scenarios.
+          Discover demo products, filter the full catalog, add items to your cart, and simulate paid
+          or failed checkout scenarios.
         </p>
 
         <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-[1fr_260px]">
@@ -178,9 +179,7 @@ export default function Products() {
           <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-slate-500">
             <span>
               Showing{" "}
-              <span className="font-semibold text-slate-900">
-                {filteredProducts.length}
-              </span>{" "}
+              <span className="font-semibold text-slate-900">{filteredProducts.length}</span>{" "}
               matching product{filteredProducts.length === 1 ? "" : "s"}.
             </span>
 
@@ -230,12 +229,8 @@ export default function Products() {
       {filteredProducts.length === 0 && (
         <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center">
           <Package className="mx-auto mb-4 h-12 w-12 text-slate-400" />
-          <h2 className="text-xl font-semibold text-slate-900">
-            No Products Found
-          </h2>
-          <p className="mt-2 text-slate-500">
-            Try a different keyword or category.
-          </p>
+          <h2 className="text-xl font-semibold text-slate-900">No Products Found</h2>
+          <p className="mt-2 text-slate-500">Try a different keyword or category.</p>
         </div>
       )}
 
@@ -267,15 +262,11 @@ export default function Products() {
                     {product.category || "General"}
                   </span>
 
-                  <span className="text-xs font-semibold text-emerald-600">
-                    Active
-                  </span>
+                  <span className="text-xs font-semibold text-emerald-600">Active</span>
                 </div>
 
                 <div className="mt-4 flex-1">
-                  <h2 className="text-xl font-semibold text-slate-900">
-                    {product.name}
-                  </h2>
+                  <h2 className="text-xl font-semibold text-slate-900">{product.name}</h2>
 
                   <p className="mt-3 line-clamp-3 min-h-[4.5rem] text-slate-500">
                     {getProductDescription(product)}

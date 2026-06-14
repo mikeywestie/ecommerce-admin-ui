@@ -1,13 +1,6 @@
 import type { FormEvent } from "react";
 import { useEffect, useMemo, useState } from "react";
-import {
-  BadgePercent,
-  Calendar,
-  Plus,
-  RefreshCw,
-  Save,
-  TicketPercent,
-} from "lucide-react";
+import { BadgePercent, Calendar, Plus, RefreshCw, Save, TicketPercent } from "lucide-react";
 
 import {
   createCoupon,
@@ -43,10 +36,7 @@ export default function Coupons() {
     [coupons]
   );
 
-  const activeCoupons = useMemo(
-    () => coupons.filter((coupon) => coupon.active).length,
-    [coupons]
-  );
+  const activeCoupons = useMemo(() => coupons.filter((coupon) => coupon.active).length, [coupons]);
 
   async function loadCoupons() {
     try {
@@ -76,9 +66,7 @@ export default function Coupons() {
         value: Number(form.value),
         expiresAt: `${form.expiresAt}T23:59:59Z`,
         reusable: form.reusable,
-        maxUsesPerCustomer: form.maxUsesPerCustomer
-          ? Number(form.maxUsesPerCustomer)
-          : null,
+        maxUsesPerCustomer: form.maxUsesPerCustomer ? Number(form.maxUsesPerCustomer) : null,
         maxTotalUses: form.maxTotalUses ? Number(form.maxTotalUses) : null,
       });
 
@@ -123,8 +111,7 @@ export default function Coupons() {
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">Coupons</h1>
           <p className="text-slate-400 mt-2">
-            Create and monitor discount coupons, usage limits, and redemption
-            activity.
+            Create and monitor discount coupons, usage limits, and redemption activity.
           </p>
         </div>
 
@@ -179,9 +166,7 @@ export default function Coupons() {
 
             <div>
               <h2 className="text-xl font-bold">Create Coupon</h2>
-              <p className="text-sm text-slate-400">
-                Add a new customer discount rule.
-              </p>
+              <p className="text-sm text-slate-400">Add a new customer discount rule.</p>
             </div>
           </div>
 
@@ -191,9 +176,7 @@ export default function Coupons() {
               <input
                 required
                 value={form.code}
-                onChange={(event) =>
-                  setForm({ ...form, code: event.target.value })
-                }
+                onChange={(event) => setForm({ ...form, code: event.target.value })}
                 placeholder="FIRSTBUY"
                 className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
               />
@@ -224,24 +207,18 @@ export default function Coupons() {
                 step="0.01"
                 type="number"
                 value={form.value}
-                onChange={(event) =>
-                  setForm({ ...form, value: Number(event.target.value) })
-                }
+                onChange={(event) => setForm({ ...form, value: Number(event.target.value) })}
                 className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm text-slate-400">
-                Expires At
-              </label>
+              <label className="mb-2 block text-sm text-slate-400">Expires At</label>
               <input
                 required
                 type="date"
                 value={form.expiresAt}
-                onChange={(event) =>
-                  setForm({ ...form, expiresAt: event.target.value })
-                }
+                onChange={(event) => setForm({ ...form, expiresAt: event.target.value })}
                 className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
               />
             </div>
@@ -250,18 +227,14 @@ export default function Coupons() {
               <input
                 type="checkbox"
                 checked={form.reusable}
-                onChange={(event) =>
-                  setForm({ ...form, reusable: event.target.checked })
-                }
+                onChange={(event) => setForm({ ...form, reusable: event.target.checked })}
                 className="h-4 w-4"
               />
               Reusable coupon
             </label>
 
             <div>
-              <label className="mb-2 block text-sm text-slate-400">
-                Max Uses Per Customer
-              </label>
+              <label className="mb-2 block text-sm text-slate-400">Max Uses Per Customer</label>
               <input
                 min="1"
                 type="number"
@@ -278,16 +251,12 @@ export default function Coupons() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm text-slate-400">
-                Max Total Uses
-              </label>
+              <label className="mb-2 block text-sm text-slate-400">Max Total Uses</label>
               <input
                 min="1"
                 type="number"
                 value={form.maxTotalUses}
-                onChange={(event) =>
-                  setForm({ ...form, maxTotalUses: event.target.value })
-                }
+                onChange={(event) => setForm({ ...form, maxTotalUses: event.target.value })}
                 placeholder="Unlimited"
                 className="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white outline-none focus:border-blue-500"
               />
@@ -306,10 +275,7 @@ export default function Coupons() {
 
         <div className="space-y-4 xl:col-span-2">
           {coupons.map((coupon) => (
-            <div
-              key={coupon.id}
-              className="rounded-2xl border border-slate-700 bg-slate-800 p-5"
-            >
+            <div key={coupon.id} className="rounded-2xl border border-slate-700 bg-slate-800 p-5">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
@@ -346,18 +312,14 @@ export default function Coupons() {
 
                 <div className="text-left lg:text-right">
                   <p className="text-sm text-slate-400">Value</p>
-                  <p className="text-3xl font-bold text-blue-400">
-                    {formatValue(coupon)}
-                  </p>
+                  <p className="text-3xl font-bold text-blue-400">{formatValue(coupon)}</p>
                 </div>
               </div>
 
               <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-4">
                 <div className="rounded-xl bg-slate-900 p-4">
                   <p className="text-xs text-slate-500">Redemptions</p>
-                  <p className="mt-1 text-lg font-bold">
-                    {coupon.totalRedemptions}
-                  </p>
+                  <p className="mt-1 text-lg font-bold">{coupon.totalRedemptions}</p>
                 </div>
 
                 <div className="rounded-xl bg-slate-900 p-4">
@@ -369,9 +331,7 @@ export default function Coupons() {
 
                 <div className="rounded-xl bg-slate-900 p-4">
                   <p className="text-xs text-slate-500">Total Limit</p>
-                  <p className="mt-1 text-lg font-bold">
-                    {coupon.maxTotalUses ?? "Unlimited"}
-                  </p>
+                  <p className="mt-1 text-lg font-bold">{coupon.maxTotalUses ?? "Unlimited"}</p>
                 </div>
 
                 <div className="rounded-xl bg-slate-900 p-4">

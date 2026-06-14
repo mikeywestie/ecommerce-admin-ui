@@ -11,10 +11,7 @@ export async function createProduct(payload: ProductFormPayload) {
   return response.data;
 }
 
-export async function updateProduct(
-  productId: number,
-  payload: ProductFormPayload
-) {
+export async function updateProduct(productId: number, payload: ProductFormPayload) {
   const response = await api.put(`/api/products/${productId}`, payload);
   return response.data;
 }

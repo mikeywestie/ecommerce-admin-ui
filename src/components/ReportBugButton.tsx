@@ -20,8 +20,7 @@ export default function ReportBugButton() {
     const canvas = await html2canvas(document.body, {
       useCORS: true,
       scale: 0.7,
-      ignoreElements: (element) =>
-        element.getAttribute("data-bug-report-ignore") === "true",
+      ignoreElements: (element) => element.getAttribute("data-bug-report-ignore") === "true",
     });
 
     return canvas.toDataURL("image/png");
@@ -104,8 +103,8 @@ export default function ReportBugButton() {
               <div>
                 <h2 className="text-2xl font-bold">Report a Bug</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  This will create a GitHub issue with your message, page
-                  context, build versions, and optional screenshot.
+                  This will create a GitHub issue with your message, page context, build versions,
+                  and optional screenshot.
                 </p>
               </div>
 
@@ -134,9 +133,7 @@ export default function ReportBugButton() {
             ) : (
               <div className="space-y-4">
                 <label className="block">
-                  <span className="text-sm font-semibold text-slate-700">
-                    What went wrong?
-                  </span>
+                  <span className="text-sm font-semibold text-slate-700">What went wrong?</span>
                   <textarea
                     value={message}
                     onChange={(event) => setMessage(event.target.value)}
@@ -147,14 +144,10 @@ export default function ReportBugButton() {
                 </label>
 
                 <label className="block">
-                  <span className="text-sm font-semibold text-slate-700">
-                    Steps to reproduce
-                  </span>
+                  <span className="text-sm font-semibold text-slate-700">Steps to reproduce</span>
                   <textarea
                     value={stepsToReproduce}
-                    onChange={(event) =>
-                      setStepsToReproduce(event.target.value)
-                    }
+                    onChange={(event) => setStepsToReproduce(event.target.value)}
                     rows={3}
                     className="mt-2 w-full rounded-2xl border border-slate-300 p-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     placeholder="1. Add product to cart&#10;2. Checkout&#10;3. Simulate payment failed"
@@ -165,9 +158,7 @@ export default function ReportBugButton() {
                   <input
                     type="checkbox"
                     checked={includeScreenshot}
-                    onChange={(event) =>
-                      setIncludeScreenshot(event.target.checked)
-                    }
+                    onChange={(event) => setIncludeScreenshot(event.target.checked)}
                     className="h-4 w-4"
                   />
                   Include screenshot of current screen
@@ -175,8 +166,7 @@ export default function ReportBugButton() {
 
                 <div className="grid grid-cols-1 gap-3 rounded-2xl bg-slate-50 p-4 text-xs text-slate-600 sm:grid-cols-2">
                   <p>
-                    Frontend: v{FRONTEND_BUILD_INFO.version}{" "}
-                    {FRONTEND_BUILD_INFO.commitShort}
+                    Frontend: v{FRONTEND_BUILD_INFO.version} {FRONTEND_BUILD_INFO.commitShort}
                   </p>
                   <p>Route: {window.location.pathname}</p>
                   <p>Role: {localStorage.getItem("role") || "unknown"}</p>

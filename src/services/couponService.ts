@@ -30,9 +30,7 @@ export async function getCoupons(): Promise<CouponResponse[]> {
   return response.data;
 }
 
-export async function createCoupon(
-  request: CreateCouponRequest
-): Promise<CouponResponse> {
+export async function createCoupon(request: CreateCouponRequest): Promise<CouponResponse> {
   const response = await api.post<CouponResponse>("/api/coupons", request);
   return response.data;
 }
