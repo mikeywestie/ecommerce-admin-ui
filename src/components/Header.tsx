@@ -19,8 +19,8 @@ type HeaderProps = {
 
 export default function Header({ onMenuClick }: HeaderProps) {
   const location = useLocation();
-  const role = localStorage.getItem("role");
-  const email = localStorage.getItem("email");
+  const role = sessionStorage.getItem("role");
+  const email = sessionStorage.getItem("email");
 
   const title =
     pageTitles[location.pathname] ||

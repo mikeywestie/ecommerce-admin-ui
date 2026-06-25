@@ -55,8 +55,8 @@ export default function ReportBugButton() {
         stepsToReproduce,
         screenshot,
         route: window.location.pathname + window.location.search,
-        userEmail: localStorage.getItem("email") || "unknown",
-        userRole: localStorage.getItem("role") || "unknown",
+        userEmail: sessionStorage.getItem("email") || "unknown",
+        userRole: sessionStorage.getItem("role") || "unknown",
         frontendVersion: FRONTEND_BUILD_INFO.version,
         frontendCommit: FRONTEND_BUILD_INFO.commitShort,
         frontendBuildTime: FRONTEND_BUILD_INFO.buildTime,
@@ -169,7 +169,7 @@ export default function ReportBugButton() {
                     Frontend: v{FRONTEND_BUILD_INFO.version} {FRONTEND_BUILD_INFO.commitShort}
                   </p>
                   <p>Route: {window.location.pathname}</p>
-                  <p>Role: {localStorage.getItem("role") || "unknown"}</p>
+                  <p>Role: {sessionStorage.getItem("role") || "unknown"}</p>
                   <p>
                     Viewport: {window.innerWidth}x{window.innerHeight}
                   </p>
