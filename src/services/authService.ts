@@ -7,19 +7,19 @@ export async function login(request: LoginRequest): Promise<AuthResponse> {
 }
 
 export function saveAuth(auth: AuthResponse) {
-  localStorage.setItem("token", auth.token);
-  localStorage.setItem("email", auth.email);
-  localStorage.setItem("role", auth.role);
+  sessionStorage.setItem("token", auth.token);
+  sessionStorage.setItem("email", auth.email);
+  sessionStorage.setItem("role", auth.role);
 }
 
 export function logout() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("email");
-  localStorage.removeItem("role");
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("email");
+  sessionStorage.removeItem("role");
 }
 
 export function getToken() {
-  return localStorage.getItem("token");
+  return sessionStorage.getItem("token");
 }
 
 export function isAuthenticated() {
