@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Activity,
   AlertTriangle,
@@ -49,7 +49,7 @@ export default function Dashboard() {
 
   const countdownRef = useRef(REFRESH_INTERVAL);
 
-  async function loadDashboardSummary() {
+  const loadDashboardSummary = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -64,10 +64,12 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
-    void loadDashboardSummary();
+    const initialLoad = window.setTimeout(() => {
+      void loadDashboardSummary();
+    }, 0);
 
     const tick = window.setInterval(() => {
       countdownRef.current -= 1;
@@ -78,8 +80,11 @@ export default function Dashboard() {
       }
     }, 1000);
 
-    return () => window.clearInterval(tick);
-  }, []);
+    return () => {
+      window.clearTimeout(initialLoad);
+      window.clearInterval(tick);
+    };
+  }, [loadDashboardSummary]);
 
   if (loading && !summary) {
     return (
