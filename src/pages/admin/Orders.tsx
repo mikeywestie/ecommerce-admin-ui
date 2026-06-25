@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, ChevronUp, Search } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
 import Button from "@/components/ui/Button";
 import Notice from "@/components/ui/Notice";
@@ -20,10 +21,12 @@ function getStatusTone(status: Order["status"]) {
 }
 
 export default function Orders() {
+  const [searchParams] = useSearchParams();
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("status") ?? "");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState<SortField>("createdAt");
