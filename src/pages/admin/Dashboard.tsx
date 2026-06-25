@@ -135,19 +135,19 @@ export default function Dashboard() {
       title: "Paid Orders",
       value: summary.paidOrders.toString(),
       icon: <CreditCard size={20} />,
-      href: "/admin/payments",
+      href: "/admin/payments?status=SUCCESS",
     },
     {
       title: "Pending Orders",
       value: summary.pendingOrders.toString(),
       icon: <Activity size={20} />,
-      href: "/admin/orders",
+      href: "/admin/orders?status=PENDING",
     },
     {
       title: "Inventory Alerts",
       value: summary.inventoryAlerts.toString(),
       icon: <AlertTriangle size={20} />,
-      href: "/admin/inventory",
+      href: "/admin/inventory?stock=ALERTS",
     },
   ];
 

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
 import Button from "@/components/ui/Button";
 import Notice from "@/components/ui/Notice";
@@ -16,10 +17,12 @@ function getStatusTone(status: Payment["paymentStatus"]) {
 }
 
 export default function Payments() {
+  const [searchParams] = useSearchParams();
+
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("status") ?? "");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 

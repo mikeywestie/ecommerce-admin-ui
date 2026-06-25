@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Archive, Edit, PackagePlus, Save, Search, SlidersHorizontal, X } from "lucide-react";
 
 import Button from "@/components/ui/Button";
@@ -49,6 +50,8 @@ function getStockLabel(quantity: number) {
 }
 
 export default function Inventory() {
+  const [searchParams] = useSearchParams();
+
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -59,7 +62,7 @@ export default function Inventory() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("ALL");
   const [statusFilter, setStatusFilter] = useState("ALL");
-  const [stockFilter, setStockFilter] = useState("ALL");
+  const [stockFilter, setStockFilter] = useState(searchParams.get("stock") ?? "ALL");
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -117,6 +120,7 @@ export default function Inventory() {
 
       const matchesStock =
         stockFilter === "ALL" ||
+        (stockFilter === "ALERTS" && item.quantityAvailable <= STOCK_THRESHOLD_WARNING) ||
         (stockFilter === "OUT" && item.quantityAvailable <= 0) ||
         (stockFilter === "LOW" &&
           item.quantityAvailable > STOCK_THRESHOLD_OUT &&
@@ -358,6 +362,7 @@ export default function Inventory() {
             className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500"
           >
             <option value="ALL">All Stock Levels</option>
+            <option value="ALERTS">Inventory Alerts</option>
             <option value="OUT">Out of Stock</option>
             <option value="LOW">Low Stock</option>
             <option value="WARNING">Almost Sold Out</option>
