@@ -260,7 +260,7 @@ export default function Dashboard() {
                     cx="50%"
                     cy="50%"
                     outerRadius={100}
-                    label={({ name, percent }) => `${name} ${Math.round(percent * 100)}%`}
+                    label={({ name, percent }) => `${name} ${Math.round((percent ?? 0) * 100)}%`}
                     labelLine={false}
                   >
                     {orderStatusData.map((_, index) => (
