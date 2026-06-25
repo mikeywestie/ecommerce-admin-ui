@@ -12,7 +12,13 @@ interface StockModalProps {
   onCancel: () => void;
 }
 
-export default function StockModal({ item, value, onChange, onConfirm, onCancel }: StockModalProps) {
+export default function StockModal({
+  item,
+  value,
+  onChange,
+  onConfirm,
+  onCancel,
+}: StockModalProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
