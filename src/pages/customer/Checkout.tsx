@@ -329,7 +329,7 @@ export default function Checkout() {
                 <div>
                   <p className="font-bold">Simulate payment failed</p>
                   <p className="text-sm">
-                    Frontend is ready; backend must honour paymentOutcome=FAILED.
+                    Demonstrates the failed payment flow.
                   </p>
                 </div>
               </div>
