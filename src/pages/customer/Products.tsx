@@ -42,6 +42,8 @@ export default function Products() {
   const [success, setSuccess] = useState("");
   const [addingProductId, setAddingProductId] = useState<number | null>(null);
 
+  const isAdmin = sessionStorage.getItem("role") === "ADMIN";
+
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(1);
@@ -286,16 +288,18 @@ export default function Products() {
                     Details
                   </Link>
 
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    onClick={() => addToCart(product.id)}
-                    disabled={addingProductId === product.id}
-                    icon={<ShoppingCart size={18} />}
-                    className="w-full"
-                  >
-                    {addingProductId === product.id ? "Adding..." : "Add"}
-                  </Button>
+                  <div title={isAdmin ? "Admins can browse but not purchase" : undefined}>
+                    <Button
+                      variant="primary"
+                      size="lg"
+                      onClick={() => addToCart(product.id)}
+                      disabled={addingProductId === product.id || isAdmin}
+                      icon={<ShoppingCart size={18} />}
+                      className="w-full"
+                    >
+                      {addingProductId === product.id ? "Adding..." : "Add"}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </article>

@@ -84,7 +84,9 @@ export default function ProductDetails() {
   const isInactive = product?.active === false || stockStatus === "INACTIVE";
   const isOutOfStock = stockStatus === "OUT_OF_STOCK" || availableQuantity <= 0;
 
-  const canAddToCart = !!product && !isInactive && !isOutOfStock && quantity <= availableQuantity;
+  const isAdmin = sessionStorage.getItem("role") === "ADMIN";
+  const canAddToCart =
+    !!product && !isAdmin && !isInactive && !isOutOfStock && quantity <= availableQuantity;
 
   const stockDisplay = useMemo(() => {
     if (isInactive) {
@@ -278,7 +280,7 @@ export default function ProductDetails() {
                 <button
                   type="button"
                   onClick={decreaseQuantity}
-                  disabled={quantity <= 1 || adding || isOutOfStock || isInactive}
+                  disabled={quantity <= 1 || adding || isOutOfStock || isInactive || isAdmin}
                   className="h-12 w-12 rounded-lg bg-white text-slate-900 shadow-sm flex items-center justify-center hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
                   aria-label="Decrease quantity"
                 >
@@ -292,7 +294,9 @@ export default function ProductDetails() {
                 <button
                   type="button"
                   onClick={increaseQuantity}
-                  disabled={adding || isOutOfStock || isInactive || quantity >= availableQuantity}
+                  disabled={
+                    adding || isOutOfStock || isInactive || isAdmin || quantity >= availableQuantity
+                  }
                   className="h-12 w-12 rounded-lg bg-white text-slate-900 shadow-sm flex items-center justify-center hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
                   aria-label="Increase quantity"
                 >
@@ -307,21 +311,25 @@ export default function ProductDetails() {
               )}
             </div>
 
-            <button
-              type="button"
-              onClick={addToCart}
-              disabled={adding || !canAddToCart}
-              className="mt-8 w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed text-white px-4 py-4 rounded-xl font-semibold transition"
-            >
-              <ShoppingCart size={20} />
-              {adding
-                ? "Adding..."
-                : isOutOfStock
-                  ? "Out of Stock"
-                  : isInactive
-                    ? "Unavailable"
-                    : "Add to Cart"}
-            </button>
+            <div title={isAdmin ? "Admins can browse but not purchase" : undefined}>
+              <button
+                type="button"
+                onClick={addToCart}
+                disabled={adding || !canAddToCart}
+                className="mt-8 w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed text-white px-4 py-4 rounded-xl font-semibold transition"
+              >
+                <ShoppingCart size={20} />
+                {adding
+                  ? "Adding..."
+                  : isAdmin
+                    ? "Admin View Only"
+                    : isOutOfStock
+                      ? "Out of Stock"
+                      : isInactive
+                        ? "Unavailable"
+                        : "Add to Cart"}
+              </button>
+            </div>
 
             <Link
               to="/customer/cart"
