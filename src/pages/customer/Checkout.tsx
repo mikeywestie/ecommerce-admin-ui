@@ -328,9 +328,7 @@ export default function Checkout() {
                 <XCircle className="h-5 w-5" />
                 <div>
                   <p className="font-bold">Simulate payment failed</p>
-                  <p className="text-sm">
-                    Demonstrates the failed payment flow.
-                  </p>
+                  <p className="text-sm">Demonstrates the failed payment flow.</p>
                 </div>
               </div>
             </button>

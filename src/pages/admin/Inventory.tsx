@@ -512,7 +512,11 @@ export default function Inventory() {
               <Button variant="ghost" onClick={() => setStockModal(null)}>
                 Cancel
               </Button>
-              <Button variant="primary" onClick={confirmStockUpdate} icon={<Save className="h-4 w-4" />}>
+              <Button
+                variant="primary"
+                onClick={confirmStockUpdate}
+                icon={<Save className="h-4 w-4" />}
+              >
                 Save
               </Button>
             </div>
