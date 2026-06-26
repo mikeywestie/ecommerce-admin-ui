@@ -13,7 +13,7 @@ function shortCommit(commit: string) {
 
 export const FRONTEND_BUILD_INFO: FrontendBuildInfo = {
   application: "ecommerce-admin-ui",
-  version: import.meta.env.VITE_APP_VERSION || "1.0.0",
+  version: import.meta.env.VITE_APP_VERSION || "1.2.4",
   environment: import.meta.env.MODE || "local",
   branch: rawBranch,
   commit: rawCommit,

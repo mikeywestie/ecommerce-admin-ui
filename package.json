@@ -1,7 +1,7 @@
 {
   "name": "ecommerce-admin-ui",
   "private": true,
-  "version": "1.2.0",
+  "version": "1.2.4",
   "homepage": "https://mikeywestie.github.io/ecommerce-admin-ui/",
   "type": "module",
   "scripts": {
